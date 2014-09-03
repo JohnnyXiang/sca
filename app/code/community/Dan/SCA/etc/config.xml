@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<modules>
+		<Dan_SCA>
+			<version>0.0.1</version>
+		</Dan_SCA>
+	</modules>
+
+	<global>
+		<blocks>
+			<dan_sca_adminhtml>
+				<class>Dan_SCA_Block_Adminhtml</class>
+			</dan_sca_adminhtml>
+			<dan_sca>
+                <class>Dan_SCA_Block</class>
+            </dan_sca>
+		</blocks>
+		
+		<helpers>
+			<dan_sca>
+				<class>Dan_SCA_Helper</class>
+			</dan_sca>
+		</helpers>
+		
+		<models>
+			<dan_sca>
+				<class>Dan_SCA_Model</class>
+				<resourceModel>dan_sca_resource</resourceModel>
+			</dan_sca>
+
+			<dan_sca_resource> <!-- This alias must match the above <resourceModel/> value. -->
+				<class>Dan_SCA_Model_Resource</class>
+				
+				<entities>
+					<state> <!-- This is the table alias referred to in install-0.0.1.php. -->
+						<table>dan_sca_state</table> <!-- actual database table name -->
+					</state>
+					<animal> <!-- This is the table alias referred to in install-0.0.1.php. -->
+						<table>dan_sca_animal</table> <!-- actual database table name -->
+					</animal>
+					<gameunit>
+						<table>dan_sca_state_gameunit</table>
+					</gameunit>
+
+					<gameunit_detail>
+						<table>dan_sca_state_gameunit_detail</table>
+					</gameunit_detail>
+
+					<required_info>
+						<table>dan_sca_state_info</table>
+					</required_info>
+				</entities>
+			</dan_sca_resource>
+		</models>
+		
+		<resources>
+			<dan_sca_setup><!-- This must match our folder name in the module sql folder. -->
+				<setup>
+					<module>Dan_SCA</module>
+					<class>Mage_Eav_Model_Entity_Setup</class>
+				</setup>
+				<connection>
+					<use>core_setup</use>
+				</connection>
+			</dan_sca_setup>
+			<dan_sca_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </dan_sca_write>
+            <dan_sca_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </dan_sca_read>
+		</resources>
+		
+		<events>
+			<catalog_product_load_after>
+				<observers>
+					<dan_sca>
+						<type>model</type>
+						<class>dan_sca/observer</class>
+						<method>catalogProductLoadAfter</method>
+					</dan_sca>
+				</observers>
+			</catalog_product_load_after>
+			<sales_convert_quote_item_to_order_item>
+			    <observers>
+			        <extra_options>
+			            <type>model</type>
+			            <class>dan_sca/observer</class>
+			            <method>salesConvertQuoteItemToOrderItem</method>
+			        </extra_options>
+			    </observers>
+			</sales_convert_quote_item_to_order_item>
+		</events>
+	</global>
+	
+	<!-- Add a router for access to our admin panel controller. -->
+	<admin>
+		<routers>
+			<dan_sca_admin><!-- Alias for this router. -->
+				<!-- Basically informs Magento to use the admin scope for requests to this router. -->
+				<use>admin</use>
+				<args>
+					<!-- Tells Magento where to find adminhtml controllers for this module. -->
+					<module>Dan_SCA_Adminhtml</module>
+					<!-- This is the term used in the actual URL. -->
+					<frontName>sportsmans-common-app-admin</frontName>
+				</args>
+			</dan_sca_admin>
+		</routers>
+	</admin>
+	
+	<frontend>
+        <layout>
+            <updates>
+                <dan_sca>
+                    <file>dan_sca.xml</file>
+                </dan_sca>
+            </updates>
+        </layout>
+        <routers>
+            <dan_sca>
+                <use>standard</use>
+                <args>
+                    <module>Dan_SCA</module>
+                    <frontName>state</frontName>
+                </args>
+            </dan_sca>
+        </routers>
+    </frontend>
+	
+</config>

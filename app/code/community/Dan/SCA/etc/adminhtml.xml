@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <!-- First, create a top-level menu item, which will appear alongside CMS -->
+        <dan_sca translate="title" module="dan_sca">
+            <title>Sportsmans Common App</title>
+            <sort_order>75</sort_order>
+            <depends>
+                <module>Dan_SCA</module>
+            </depends>
+
+            <!-- Under this top-level menu, create a child menu item. -->
+            <children>
+                <state translate="title" module="dan_sca">
+                    <title>Manage States</title>
+                    <sort_order>10</sort_order>
+					<action>dan_sca_admin/state</action><!-- When the menu is clicked, take the user here.-->
+                </state>
+            </children>
+        </dan_sca>
+    </menu>
+
+    <!-- Define ACL for access to these menu items. -->
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <dan_sca translate="title" module="dan_sca">
+                        <title>Sportsmans Common App</title>
+                        <sort_order>75</sort_order>
+                        <children>
+                            <state translate="title" module="dan_sca">
+                                <title>Manage States</title>
+                            </state>
+                        </children>
+                    </dan_sca>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+	
+    <layout>
+        <updates>
+            <dan_sca>
+                <file>dan_sca.xml</file>
+            </dan_sca>
+        </updates>
+    </layout>
+</config>
