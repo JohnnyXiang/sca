@@ -59,6 +59,8 @@ app/design/frontend/base/default/template/core
 app/design/frontend/base/default/template/customer
 app/design/frontend/base/default/template/directory
 app/design/frontend/base/default/template/downloadable
+app/design/frontend/base/default/template/email
+app/design/frontend/base/default/template/giftmessage
 app/design/frontend/base/default/template/googleanalytics
 app/design/frontend/base/default/template/moneybookers
 app/design/frontend/base/default/template/newsletter
