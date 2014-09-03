@@ -1,0 +1,16 @@
+<h1><?php echo $this->__('Gameunit Directory'); ?></h1>
+
+<?php $gameunitCollection = $this->getGameunitCollection(); ?>
+<?php if ($gameunitCollection->count() > 0): ?>
+    
+    <ul>
+        <?php foreach ($gameunitCollection as $_gameunit): ?>    
+            <li><a href="<?php echo $this->helper('dan_sca/gameunit')->getGameunitUrl($_gameunit); ?>" title="<?php echo $this->escapeHtml($_gameunit->getName()); ?>"><?php echo $_gameunit->getName(); ?></a></li>
+        <?php endforeach; ?>
+    </ul>
+    
+<?php else: ?>
+    
+    <?php echo $this->__('There are no gameunits to display at this time.'); ?>
+    
+<?php endif; ?>

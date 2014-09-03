@@ -1,0 +1,11 @@
+<!--?xml version="1.0"?-->
+<layout version="0.1.0">
+    <dan_sca_adminhtml_state_edit>
+		<reference name="left"><!-- side menu block !-->
+			<block type="dan_sca/adminhtml_state_edit_tabs" name="tabs"></block>
+		</reference>
+		<reference name="content"><!-- content block !-->
+            <block type="dan_sca/adminhtml_state_edit" name="form"></block>
+        </reference>
+    </dan_sca_adminhtml_state_edit>
+</layout>

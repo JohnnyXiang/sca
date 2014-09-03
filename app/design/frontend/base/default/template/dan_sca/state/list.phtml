@@ -1,0 +1,16 @@
+<h1><?php echo $this->__('State Directory'); ?></h1>
+
+<?php $stateCollection = $this->getStateCollection(); ?>
+<?php if ($stateCollection->count() > 0): ?>
+    
+    <ul>
+        <?php foreach ($stateCollection as $_state): ?>    
+            <li><a href="<?php echo $this->helper('dan_sca/state')->getStateUrl($_state); ?>" title="<?php echo $this->escapeHtml($_state->getName()); ?>"><?php echo $_state->getName(); ?></a></li>
+        <?php endforeach; ?>
+    </ul>
+    
+<?php else: ?>
+    
+    <?php echo $this->__('There are no states to display at this time.'); ?>
+    
+<?php endif; ?>

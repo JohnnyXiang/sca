@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<layout>
+	<!-- state front-end display !-->
+    <dan_sca_index_index> <!-- namespace_module_controller_action !-->
+        <reference name="content">
+            <block type="dan_sca/state_list" name="dan.sca.state.list" template="dan_sca/state/list.phtml" />
+        </reference>
+    </dan_sca_index_index>
+    <dan_sca_index_view>
+        <reference name="content">
+            <block type="dan_sca/state_view" name="dan.sca.state.view" template="dan_sca/state/view.phtml" />
+        </reference>
+    </dan_sca_index_view>
+	
+	<!-- gameunit front-end display !-->
+    <dan_sca_index_gameunit>
+        <reference name="content">
+            <block type="dan_sca/gameunit_view" name="dan.sca.gameunit.view" template="dan_sca/gameunit/view.phtml" />
+        </reference>
+    </dan_sca_index_gameunit>
+</layout>

@@ -1,0 +1,9 @@
+<?php $gameunit = $this->getCurrentGameunit(); ?>
+<?php if ($gameunit): ?>
+    
+    <h1><?php echo $gameunit->getName(); ?></h1>
+    <p><a href="<?php echo $this->helper('dan_sca/gameunit')->getGameunitUrl($gameunit); ?>" title="<?php echo $this->escapeHtml($gameunit->getName()); ?>"><?php echo $gameunit->getName(); ?></a></p>
+    <?php echo $gameunit->getDescription(); ?>
+    <p><a href="<?php echo $this->getUrl('dan_sca/index/index') ?>" title="<?php echo $this->__('Back to Gameunit Directory'); ?>"><?php echo $this->__('&laquo; Back to Gameunit Directory'); ?></a></p>
+    
+<?php endif; ?>
