@@ -13,9 +13,9 @@
     </dan_sca_index_view>
 	
 	<!-- gameunit front-end display !-->
-    <dan_sca_index_gameunit>
+    <dan_sca_gameunit_view>
         <reference name="content">
             <block type="dan_sca/gameunit_view" name="dan.sca.gameunit.view" template="dan_sca/gameunit/view.phtml" />
         </reference>
-    </dan_sca_index_gameunit>
+    </dan_sca_gameunit_view>
 </layout>

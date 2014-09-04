@@ -1,7 +1,6 @@
 <?php
 	class Dan_SCA_Helper_Data extends Mage_Core_Helper_Abstract{
 	    
-		// not working ...
 		public function getState(){
             // This will have been set in the controller.
             $state = Mage::registry('current_state');

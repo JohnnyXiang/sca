@@ -1,9 +1,27 @@
 <?php $state = $this->getCurrentState(); ?>
 <?php if ($state): ?>
-    
-    <h1><?php echo $state->getName(); ?></h1>
-    <p><a href="<?php echo $this->helper('dan_sca/state')->getStateUrl($state); ?>" title="<?php echo $this->escapeHtml($state->getName()); ?>"><?php echo $state->getName(); ?></a></p>
-    <?php echo $state->getDescription(); ?>
+	
+	<h1><?php echo $state->getName(); ?></h1>
+	<p><?php echo $state->getDescription(); ?></p>
+	
+
+	<?php $gameunits = $this->getStateGameunits(); ?>
+	<?php if ($gameunits->count() > 0): ?>
+		
+	    <ul>
+	        <?php foreach ($gameunits as $_gameunit): ?>    
+	            <li><a href="<?php echo $this->helper('dan_sca/gameunit')->getGameunitUrl($_gameunit); ?>" title="<?php echo $this->escapeHtml($_gameunit->getName()); ?>"><?php echo $_gameunit->getName(); ?></a></li>
+	        <?php endforeach; ?>
+	    </ul>
+
+	<?php else: ?>
+
+	    <?php echo $this->__('There are no gameunits to display at this time.'); ?>
+
+	<?php endif; ?>
+	<br />
+	<br />
+	
     <p><a href="<?php echo $this->getUrl('dan_sca/index/index') ?>" title="<?php echo $this->__('Back to State Directory'); ?>"><?php echo $this->__('&laquo; Back to State Directory'); ?></a></p>
     
 <?php endif; ?>
