@@ -12,5 +12,21 @@
 
 	        return $state;
 	    }
+		
+		// function to retrieve the current_product's gameunis (and their details) for a given state/animal combo
+		public function getProductGameunitsAndDetails($state_id, $animal_id){
+			
+			// get all gameunit details, filtering on the specified animal_id
+		    $collection = Mage::getModel('dan_sca/gameunit_detail')->getCollection()
+				->addFieldToFilter('animal_id', $animal_id);
+
+			// join with gameunits, ensuring only the specified state_id is used
+			$collection->getSelect()
+				->join(array('gu' => 'dan_sca_state_gameunit'), 'gu.entity_id = main_table.parent_id')
+				->where('gu.parent_id = '.$state_id)
+				->columns(new Zend_Db_Expr("`gu`.`name` AS gameunit_name"));
+			
+	        return $collection;
+	    }
 	}
 ?>
