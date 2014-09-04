@@ -7,6 +7,22 @@
 	<br />
 	<br />
 	
+<?php // this is where we get (and then format) the gameunits details ?>
+	<?php $details = $this->getGameunitDetails(); ?>
+	<?php if ($details->count() > 0): ?>
+		
+	    <ul>
+	        <?php foreach ($details as $_detail): ?>    
+	            <li><?php echo $_detail->getYear(); ?></li>
+	        <?php endforeach; ?>
+	    </ul>
+
+	<?php else: ?>
+
+	    <?php echo $this->__('There are no details for this gameunit at this time.'); ?>
+
+	<?php endif; ?>
+	
 	<?php $state = $this->helper('dan_sca/state')->getCurrentState(); ?>
 	
     <p><a href="<?php echo $this->helper('dan_sca/state')->getStateUrl($state); ?>" title="<?php echo $this->__('Back to ' . $state->getName()); ?>"><?php echo $this->__('&laquo; Back to ' . $state->getName()); ?></a></p>
