@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<layout>
+<layout version="0.1.0">
 	<!-- state front-end display !-->
     <dan_sca_index_index> <!-- namespace_module_controller_action !-->
         <reference name="content">
@@ -18,4 +18,15 @@
             <block type="dan_sca/gameunit_view" name="dan.sca.gameunit.view" template="dan_sca/gameunit/view.phtml" />
         </reference>
     </dan_sca_gameunit_view>
+	
+	<catalog_product_view>
+		<reference name="product.info">
+		    <action method="setTemplate">
+				<template>dan_sca/product/view.phtml</template>
+			</action>
+		</reference>
+		<reference name="product.info.options.wrapper">
+			<block type="dan_sca/product_option" name="dan.sca.product.option" template="dan_sca/product/temp.phtml" />
+		</reference>
+	</catalog_product_view>
 </layout>

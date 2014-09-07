@@ -89,7 +89,7 @@
 	$table = new Varien_Db_Ddl_Table();
 	$table->setName($installer->getTable('dan_sca/animal'));
 	$table->addColumn(
-	    'animal_id',
+	    'entity_id',
 	    Varien_Db_Ddl_Table::TYPE_INTEGER,
 	    10,
 	    array(
@@ -102,7 +102,7 @@
 	$table->addColumn(
 	    'name',
 	    Varien_Db_Ddl_Table::TYPE_VARCHAR,
-	    255,
+	    55,
 	    array(
 	        'nullable' => false,
 	    )
@@ -449,23 +449,28 @@
 	$installer->getConnection()->createTable($table);
 	
 	
-
+	
 	// add a new product attribute to associate a brand to each product
+	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY,'state_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id', array(
 	    'group'         => 'General',
 	    'label'         => 'State',
 	    'input'         => 'select',
-	    'source'        => 'dan_sca/source_state',
+	    'source'        => 'dan_sca/source_state'
 	));
 	
 	// add a new product attribute to associate a brand to each product
+	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY,'animal_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id', array(
 	    'group'         => 'General',
 	    'label'         => 'Animal',
 	    'input'         => 'multiselect',
+		'type'			=> 'varchar',
+		'backend'		=> 'eav/entity_attribute_backend_array',
 	    'source'        => 'dan_sca/source_animal',
+		'searchable'	=> true
 	));
-	
+
 	// create new attribute sets
 	$sNewAttributeSetName = 'Draw Entry';
 	$iCatalogProductEntityTypeId = (int) $installer->getEntityTypeId('catalog_product');
@@ -483,7 +488,6 @@
 	else {
 	    die('Attributeset with name ' . $sNewAttributeSetName . ' already exists.');
 	}
-	
 
 	$installer->endSetup();
 ?>

@@ -75,27 +75,6 @@
                 </connection>
             </dan_sca_read>
 		</resources>
-		
-		<events>
-			<catalog_product_load_after>
-				<observers>
-					<dan_sca>
-						<type>model</type>
-						<class>dan_sca/observer</class>
-						<method>catalogProductLoadAfter</method>
-					</dan_sca>
-				</observers>
-			</catalog_product_load_after>
-			<sales_convert_quote_item_to_order_item>
-			    <observers>
-			        <extra_options>
-			            <type>model</type>
-			            <class>dan_sca/observer</class>
-			            <method>salesConvertQuoteItemToOrderItem</method>
-			        </extra_options>
-			    </observers>
-			</sales_convert_quote_item_to_order_item>
-		</events>
 	</global>
 	
 	<!-- Add a router for access to our admin panel controller. -->
