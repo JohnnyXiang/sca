@@ -9,11 +9,11 @@ class Dan_SCA_Model_Resource_Gameunit_Detail extends Mage_Core_Model_Resource_Db
          *
          * In this example:
          * - dan_sca is the model alias
-         * - state is the entity referenced in config.xml
+         * - gameunit_detail is the entity referenced in config.xml
          * - entity_id is the name of the primary key column
          *
          * As a result, Magento will write data to the table
-         * 'dan_sca_state' and any calls
+         * 'dan_sca_gameunit_detail' and any calls
          * to $model->getId() will retrieve the data from the
          * column named 'entity_id'.
          */

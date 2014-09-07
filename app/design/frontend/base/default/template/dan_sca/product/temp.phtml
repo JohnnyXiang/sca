@@ -5,23 +5,30 @@
 	
 	$stateId = $catalogHelper->productAttribute($_product, $_product->getStateId(), 'state_id');
 	$animalId = $catalogHelper->productAttribute($_product, $_product->getAnimalId(), 'animal_id');
+	
+	// need to make sure the results are coming across as last X-years (or 'current'), GROUP BY gameunit_name, ORDER BY year (w/'current' on top)
 	$details = $scaHelper->getProductGameunitsAndDetails($stateId, $animalId);
 
 	$selText = "-- Select --"; 
 
-	// store raw choices (for the first dropdown) in the $weapon_choices array
+	// array for weapon choices
 	$weapon_choices = [];
 	
-	// store the gameunit choices (for the second dropdown) in a separate array with Weapon Choice as the key
+	// associative array w/ weapon-choice as the key
 	$weapon_choices_gameunits = [];
+	
+	// associative array for gameunit statistics
+	$stats = [];
 	
 	$_gameunit = '';
 	$_firstPass = false;
+	
 	foreach($details as $_detail){
+
 		$_weapon = $_detail->getWeapon();
+		
 		if($_detail->getYear() == 'current'){
 			$_gameunit = $_detail->getGameunitName();
-			$_firstPass = true;
 			if(key_exists($_weapon, $weapon_choices_gameunits)){
 				array_push($weapon_choices_gameunits[$_weapon], $_detail->getGameunitName());
 			}
@@ -31,13 +38,35 @@
 				array_push($weapon_choices, $_weapon);
 			};
 		}
+		// *** could DRY up this code ... had trouble w/scope of variables ... wouldn't manipulate $stat variable
 		else if($_detail->getGameunitName() == $_gameunit){
-			
+			if(key_exists($_weapon, $stats)){
+				if(key_exists($_gameunit, $stats[$_weapon])){
+					$stats[$_weapon][$_gameunit][0] += $_detail->getAvailableTags();
+					$stats[$_weapon][$_gameunit][1] += $_detail->getTagApplications();
+				}
+				else{
+					$stats[$_weapon][$_gameunit] = [];
+					array_push($stats[$_weapon][$_gameunit], $_detail->getAvailableTags());
+					array_push($stats[$_weapon][$_gameunit], $_detail->getTagApplications());
+				};
+			}
+			else{
+				$stats[$_weapon] = [];
+				if(key_exists($_gameunit, $stats[$_weapon])){
+					$stats[$_weapon][$_gameunit][0] += $_detail->getAvailableTags();
+					$stats[$_weapon][$_gameunit][1] += $_detail->getTagApplications();
+				}
+				else{
+					$stats[$_weapon][$_gameunit] = [];
+					array_push($stats[$_weapon][$_gameunit], $_detail->getAvailableTags());
+					array_push($stats[$_weapon][$_gameunit], $_detail->getTagApplications());
+				};
+			};
 		};
 	};
 
 	$js_weapon_choices_gameunits = json_encode($weapon_choices_gameunits);
-
 ?>
 
 	<!-- <p class="required"><?php // echo $this->__('* Required Fields') ?></p> !-->
