@@ -48,7 +48,9 @@ class Dan_SCA_GameunitController extends Mage_Core_Controller_Front_Action {
 			// get url of the membership product and forward the user there
 			$membershipUrl =  Mage::getModel('catalog/product')->loadByAttribute('sku', 'MEMBERSHIP')->getProductUrl();
 			$baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
-			$_url = explode($baseUrl, $membershipUrl); 
+			$_url = explode($baseUrl, $membershipUrl);
+			
+			Mage::getSingleton('core/session')->addSuccess("Become an SCA member to gain access!");
 			$this->_redirect($_url[1]);
 		};
 

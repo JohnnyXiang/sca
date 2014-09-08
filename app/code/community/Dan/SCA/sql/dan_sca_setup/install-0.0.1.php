@@ -2,7 +2,6 @@
 	$installer = $this;
 	$installer->startSetup();
 	
-	/*
 	// create state table (non-EAV)
 	$table = new Varien_Db_Ddl_Table();
 	$table->setName($installer->getTable('dan_sca/state'));
@@ -377,7 +376,7 @@
 			'dan_sca/animal',
 			'entity_id'
 		),
-		'animal',
+		'animal_id',
 		$installer->getTable('dan_sca/animal'), 
 		'entity_id',
 		Varien_Db_Ddl_Table::ACTION_CASCADE, 
@@ -532,7 +531,6 @@
 	    $attribute->setIsUsedForPromoRules(1)->save();
 	};
 	
-	*/
 	$entity = $installer->getEntityTypeId('customer');
 	$attributeCode = 'membership_date';
 	
@@ -549,7 +547,6 @@
 	    'visible_on_front' 	=> false
 	));
 	
-	/*
     $rule = Mage::getModel('salesrule/rule');
     $rule->setName('Membership Discount')
       ->setDescription('Reduce all other item prices to $0 if the shopper is in the process of buying a membership')
@@ -593,7 +590,6 @@
 
     $rule->getActions()->addCondition($actions);
     $rule->save();
-	*/
 
 	$installer->endSetup();
 ?>
