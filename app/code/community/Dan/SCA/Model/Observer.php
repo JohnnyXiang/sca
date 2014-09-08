@@ -24,6 +24,7 @@ class Dan_SCA_Model_Observer{
 				// get the order's customer and set their group --> 'Members'
 				$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
 			    $customer->setGroupId($targetGroup->getId());
+				$customer->setMembershipDate(date("Y-m-d H:i:s", Mage::getModel('core/date')->timestamp(time())));
 			    $customer->save();
 				break;
 			};
