@@ -33,13 +33,33 @@
 ?>
 <?php $_helper = $this->helper('catalog/output'); ?>
 <?php $_product = $this->getProduct(); ?>
+<?php
+	
+	/* Code to Support Changing Display based on Attribute Set (product type) */
+	
+	// Get attribute set model.
+	$model = Mage::getModel('eav/entity_attribute_set');
+
+	// Get attribute set id.
+	$attributeSetId = $_product->getAttributeSetId();
+	$attributeSet = $model->load($attributeSetId);
+
+	// This is attribute set name.
+	$attributeSetName = $attributeSet->getAttributeSetName();
+	
+	$gameunitOptions = $attributeSetName == 'Draw Entry' ? 1 : 0;
+?>
+
+
+
+
 <script type="text/javascript">
     var optionsPrice = new Product.OptionsPrice(<?php echo $this->getJsonConfig() ?>);
 </script>
 <div id="messages_product_view"><?php echo $this->getMessagesBlock()->getGroupedHtml() ?></div>
 <div class="product-view">
     <div class="product-essential">
-        <form action="<?php echo $this->getSubmitUrl($_product) ?>" method="post" id="product_addtocart_form" enctype="multipart/form-data">
+        <form action="<?php echo $this->getSubmitUrl($_product) ?>" method="post" id="product_addtocart_form" <?php if($gameunitOptions): echo 'enctype="multipart/form-data"'; endif; ?>>
 			
 			<?php echo $this->getBlockHtml('formkey') ?>
             <div class="no-display">
@@ -82,7 +102,7 @@
 
                 <?php echo $this->getChildHtml('other');?>
                 
-				<?php if (!$this->hasOptions()):?>
+				<?php if ($gameunitOptions):?>
                 	<?php echo $this->getChildChildHtml('container1', '', true, true) ?>
 				<?php endif; ?>
 
@@ -92,10 +112,18 @@
                 <?php echo $this->getChildHtml('product_type_data') ?>
                 <?php echo $this->getChildHtml('extrahint') ?>
 
-                <?php if ($this->hasOptions()):?>
+                <?php if (!$gameunitOptions):?>
                     <div class="add-to-box">
                         <?php if($_product->isSaleable()): ?>
                             <?php echo $this->getChildHtml('addtocart') ?>
+							
+							
+							<script type="text/javascript">
+								var button = document.getElementById("addToCart");
+								button.disabled=false;
+							</script>
+							
+							
                             <?php if( $this->helper('wishlist')->isAllow() || $_compareUrl=$this->helper('catalog/product_compare')->getAddUrl($_product)): ?>
                                 <span class="or"><?php echo $this->__('OR') ?></span>
                             <?php endif; ?>
