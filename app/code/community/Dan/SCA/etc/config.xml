@@ -75,6 +75,27 @@
                 </connection>
             </dan_sca_read>
 		</resources>
+		
+		<events>
+	        <sales_order_place_after>
+	            <observers>
+	                <dan_sca>
+						<type>singleton</type>
+	                    <class>dan_sca/observer</class>
+	                    <method>upgradeMember</method>
+	                </dan_sca>
+	            </observers>
+	        </sales_order_place_after>
+			<catalog_product_prepare_save>
+	            <observers>
+	                <dan_sca>
+						<type>singleton</type>
+	                    <class>dan_sca/observer</class>
+	                    <method>addMemberGroupPrice</method>
+	                </dan_sca>
+	            </observers>
+			</catalog_product_prepare_save>
+	    </events>
 	</global>
 	
 	<!-- Add a router for access to our admin panel controller. -->

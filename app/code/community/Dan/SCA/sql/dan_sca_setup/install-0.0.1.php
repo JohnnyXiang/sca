@@ -371,6 +371,16 @@
 		'entity_id',
 		Varien_Db_Ddl_Table::ACTION_CASCADE, 
 		Varien_Db_Ddl_Table::ACTION_CASCADE);
+    $table->addForeignKey($installer->getFkName('dan_sca_state_gameunit_detail', 
+			'animal_id', 
+			'dan_sca/animal',
+			'entity_id'
+		),
+		'animal',
+		$installer->getTable('dan_sca/animal'), 
+		'entity_id',
+		Varien_Db_Ddl_Table::ACTION_CASCADE, 
+		Varien_Db_Ddl_Table::ACTION_CASCADE);
 	$table->setOption('type', 'InnoDB');
 	$table->setOption('charset', 'utf8');
 	$installer->getConnection()->createTable($table);
@@ -450,7 +460,7 @@
 	
 	
 	
-	// add a new product attribute to associate a brand to each product
+	// add state_id attribute to products
 	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY,'state_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id', array(
 	    'group'         => 'General',
@@ -459,7 +469,7 @@
 	    'source'        => 'dan_sca/source_state'
 	));
 	
-	// add a new product attribute to associate a brand to each product
+	// add animal_id attribute to products
 	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY,'animal_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id', array(
 	    'group'         => 'General',
@@ -471,7 +481,7 @@
 		'searchable'	=> true
 	));
 
-	// create new attribute sets
+	// create a new attribute set for Draw Entry
 	$sNewAttributeSetName = 'Draw Entry';
 	$iCatalogProductEntityTypeId = (int) $installer->getEntityTypeId('catalog_product');
 
@@ -487,6 +497,17 @@
 	}
 	else {
 	    die('Attributeset with name ' . $sNewAttributeSetName . ' already exists.');
+	}
+	
+	// add 'Members' customer group
+	Mage::getSingleton('customer/group')->setData(array('customer_group_code' => 'Members', 'tax_class_id' => 3))
+		->save();
+	
+	// make the SKU attribute available for shopping cart price rules
+	$attributeId = Mage::getResourceModel('eav/entity_attribute')->getIdByCode('catalog_product', 'sku');
+	if ($attributeId) {
+	    $attribute = Mage::getModel('catalog/resource_eav_attribute')->load($attributeId);
+	    $attribute->setIsUsedForPromoRules(1)->save();
 	}
 
 	$installer->endSetup();

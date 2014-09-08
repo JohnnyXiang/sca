@@ -1,6 +1,15 @@
 <?php
 	class Dan_SCA_Helper_Data extends Mage_Core_Helper_Abstract{
 	    
+		/*
+		Mage::log(
+		    (string)$observer->getEvent()->getOrder()->getId(), //Objects extending Varien_Object can use this
+		    null,  //Log level
+		    'my.log',         //Log file name; if blank, will use config value (system.log by default)
+		    true              //force logging regardless of config setting
+		);
+		*/
+		
 		public function getState(){
             // This will have been set in the controller.
             $state = Mage::registry('current_state');
