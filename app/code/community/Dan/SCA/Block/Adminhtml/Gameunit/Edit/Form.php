@@ -30,41 +30,50 @@ class Dan_SCA_Block_Adminhtml_Gameunit_Edit_Form extends Mage_Adminhtml_Block_Wi
                 'input' => 'text',
                 'required' => true,
             ),
+            'description' => array(
+                'label' => $this->__('Description'),
+                'input' => 'textarea',
+                'required' => true,
+            ),
             'url_key' => array(
                 'label' => $this->__('URL Key'),
                 'input' => 'text',
                 'required' => true,
 			),
-			// while hidden, we declare this so that when the gameunitData[] array is built, it includes data for parent_id
+            'website_id' => array(
+                'label' => $this->__('HTML Identifier'),
+                'input' => 'text',
+                'required' => false,
+            ),
+            'size' => array(
+                'label' => $this->__('Land Area (sq-mi)'),
+                'input' => 'text',
+                'required' => false,
+            ),
             'parent_id' => array(
                 'label' => $this->__('Parent ID'),
                 'input' => 'hidden',
                 'required' => true,
-			)
-			/*
+			),
             'members_only' => array(
-                'label' => $this->__('Members Only?'),
-				'input' => 'boolean',
+                'label' => $this->__('Members-only?'),
+				'input' => 'select',
 				'options' => array (
 						1 => 'Yes',
-						0 => 'No',
+						0 => 'No'
         			),
                 'required' => true,
-            ),
-			*/
+			)
         ));
 
         return $this;
     }
 
-    /**
-     * This method makes life a little easier for us by pre-populating
-     * fields with $_POST data where applicable and wrapping our post data
-     * in 'stateData' so that we can easily separate all relevant information
-     * in the controller. You could of course omit this method entirely and call the $fieldset->addField() method directly.
-     */
     protected function _addFieldsToFieldset(Varien_Data_Form_Element_Fieldset $fieldset, $fields){
         $requestData = new Varien_Object($this->getRequest()->getPost('gameunitData'));
+
+		// set the parent_id from current_state for new objects ==> will return false if we are editing
+		$parent_id = $this->_getHelper()->getState()->getId();
 
         foreach ($fields as $name => $_data) {
             if ($requestValue = $requestData->getData($name)) {
@@ -82,13 +91,9 @@ class Dan_SCA_Block_Adminhtml_Gameunit_Edit_Form extends Mage_Adminhtml_Block_Wi
                 $_data['value'] = $this->_getGameunit()->getData($name);
             }
 			
-			/* 
-			*	Note: this does not work (current_state not set by controller?), but we need to ensure 
-			*    that the Gameunit's Parent_ID value == the current_state's Entity_ID value
-			*/
-	//		if($name == 'parent_id'){
-	//			$_data['value'] = $this->_getHelper()->getState()->getData('entity_id');
-	//		}
+			if($name == 'parent_id' && $parent_id){
+				$_data['value'] = $parent_id;
+			};
 			
             // Finally, call vanilla functionality to add field.
             $fieldset->addField($name, $_data['input'], $_data);

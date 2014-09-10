@@ -3,10 +3,10 @@
 	    
 		/*
 		Mage::log(
-		    (string)$observer->getEvent()->getOrder()->getId(), //Objects extending Varien_Object can use this
-		    null,  //Log level
-		    'my.log',         //Log file name; if blank, will use config value (system.log by default)
-		    true              //force logging regardless of config setting
+		    (string)'update residence action',
+		    null,
+		    'my.log',
+		    true
 		);
 		*/
 		

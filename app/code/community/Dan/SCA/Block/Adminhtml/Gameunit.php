@@ -34,7 +34,7 @@ class Dan_SCA_Block_Adminhtml_Gameunit
          * be redirected to - in our example, the method editAction of
          * GameunitController.php in SportsmansCommonApp module.
          */
-        return $this->getUrl('dan_sca_admin/gameunit/edit');
+        return $this->getUrl('dan_sca_admin/gameunit/edit', array('state_id' => Mage::helper('dan_sca')->getState()->getId()));
     }
 }
 ?>

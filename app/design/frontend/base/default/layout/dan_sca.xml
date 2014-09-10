@@ -1,5 +1,14 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
+	
+	<default>
+		<reference name="head">
+			<action method="addItem"><type>skin_js</type><name>js/jquery.colorbox-min.js</name></action>
+			<action method="addCss"><stylesheet>css/colorbox.css</stylesheet></action>
+		</reference>   
+	</default>
+	
+	
 	<!-- state front-end display !-->
     <dan_sca_index_index> <!-- namespace_module_controller_action !-->
         <reference name="content">

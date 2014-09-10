@@ -36,20 +36,20 @@
 					<state> <!-- This is the table alias referred to in install-0.0.1.php. -->
 						<table>dan_sca_state</table> <!-- actual database table name -->
 					</state>
+					<state_info>
+						<table>dan_sca_state_info</table>
+					</state_info>
+					
 					<animal> <!-- This is the table alias referred to in install-0.0.1.php. -->
 						<table>dan_sca_animal</table> <!-- actual database table name -->
 					</animal>
+					
 					<gameunit>
 						<table>dan_sca_state_gameunit</table>
 					</gameunit>
-
 					<gameunit_detail>
 						<table>dan_sca_state_gameunit_detail</table>
 					</gameunit_detail>
-
-					<required_info>
-						<table>dan_sca_state_info</table>
-					</required_info>
 				</entities>
 			</dan_sca_resource>
 		</models>

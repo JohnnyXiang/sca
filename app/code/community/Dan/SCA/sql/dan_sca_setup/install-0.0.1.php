@@ -388,7 +388,7 @@
 	
 	// create state info table (non-EAV) 
 	$table = new Varien_Db_Ddl_Table();
-	$table->setName($installer->getTable('dan_sca/required_info'));
+	$table->setName($installer->getTable('dan_sca/state_info'));
 	$table->addColumn(
 	    'entity_id',
 	    Varien_Db_Ddl_Table::TYPE_INTEGER,
@@ -410,11 +410,36 @@
 	    )
 	);
 	$table->addColumn(
+	    'name',
+	    Varien_Db_Ddl_Table::TYPE_VARCHAR,
+	    55,
+	    array(
+	        'nullable' => false,
+	    )
+	);
+	$table->addColumn(
 	    'attribute_code',
 	    Varien_Db_Ddl_Table::TYPE_VARCHAR,
 	    255,
 	    array(
 	        'nullable' => false,
+	    )
+	);
+	$table->addColumn(
+	    'input_type',
+	    Varien_Db_Ddl_Table::TYPE_VARCHAR,
+	    10,
+	    array(
+	        'nullable' => false,
+	    )
+	);
+	$table->addColumn(
+	    'required',
+	    Varien_Db_Ddl_Table::TYPE_BOOLEAN,
+	    null,
+	    array(
+	        'nullable' => false,
+			'default' => 1
 	    )
 	);
 	$table->addColumn(
@@ -479,10 +504,11 @@
 
 	
 	// add state_id attribute to products
-	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY,'state_id');
+	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id', array(
 		'attribute_set' => 'Draw Entry',
 	    'label'         => 'State',
+		'type'			=> 'int',
 	    'input'         => 'select',
 	    'source'        => 'dan_sca/source_state',
 		'searchable'	=> true,
@@ -490,7 +516,7 @@
 	));
 	
 	// add animal_id attribute to products
-	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY,'animal_id');
+	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id', array(
 		'attribute_set' => 'Draw Entry',
 	    'label'         => 'Animal',
@@ -501,41 +527,46 @@
 		'searchable'	=> true,
 		'user_defined'	=> true 
 	));
+
+	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_resident');
+	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_resident', array(
+		'attribute_set' => 'Draw Entry',
+	    'label'         => 'Resident Fee',
+	    'input'         => 'price',
+		'type'			=> 'dec',
+		'user_defined'	=> true 
+	));
 	
-	$attributeId = $this->getAttributeId('catalog_product', 'state_id');
+	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_non_resident');
+	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_non_resident', array(
+		'attribute_set' => 'Draw Entry',
+	    'label'         => 'Non-Resident Fee',
+	    'input'         => 'price',
+		'type'			=> 'dec',
+		'user_defined'	=> true 
+	));
+	
+
 	$attributeSetId = $this->getAttributeSetId('catalog_product', 'Draw Entry');
 	$attributeGroupId = $this->getAttributeGroupId('catalog_product', $attributeSetId, 'General');
 	
-	Mage::log(
-	    (string)$attributeId, //Objects extending Varien_Object can use this
-	    null,  //Log level
-	    'my.log',         //Log file name; if blank, will use config value (system.log by default)
-	    true              //force logging regardless of config setting
-	);
+	$attributeList = ['animal_id', 'state_id', 'fee_resident', 'fee_non_resident'];
 	
-	// add attribute to set
-	$this->addAttributeToSet('catalog_product', $attributeSetId, $attributeGroupId, $attributeId);
-	
-	// *** clean this up, especially for when there are more attributes
-	$attributeId = $this->getAttributeId('catalog_product', 'animal_id');
-	$this->addAttributeToSet('catalog_product', $attributeSetId, $attributeGroupId, $attributeId);
+	// add attributes to set
+	foreach($attributeList as $_attr){
+		$_attributeId = $this->getAttributeId('catalog_product', $_attr);
+		$this->addAttributeToSet('catalog_product', $attributeSetId, $attributeGroupId, $_attributeId);
+	};
 	
 	// add 'Members' customer group
 	Mage::getSingleton('customer/group')->setData(array('customer_group_code' => 'Members', 'tax_class_id' => 3))
 		->save();
 	
-	// make the SKU attribute available for shopping cart price rules
-	$attributeId = Mage::getResourceModel('eav/entity_attribute')->getIdByCode('catalog_product', 'sku');
-	if ($attributeId) {
-	    $attribute = Mage::getModel('catalog/resource_eav_attribute')->load($attributeId);
-	    $attribute->setIsUsedForPromoRules(1)->save();
-	};
-	
+	// add membership_date to customer entity (to track when a person upgrades)
 	$entity = $installer->getEntityTypeId('customer');
-	$attributeCode = 'membership_date';
 	
-	$installer->removeAttribute($entity, $attributeCode);
-	$installer->addAttribute($entity, $attributeCode, array(
+	$installer->removeAttribute($entity, 'membership_date');
+	$installer->addAttribute($entity, 'membership_date', array(
 	    'label' 			=> 'Upgraded to Member',
 		'input' 			=> 'date',
 		'type' 				=> 'datetime',
@@ -547,6 +578,91 @@
 	    'visible_on_front' 	=> false
 	));
 	
+	// *** untested
+	$installer->removeAttribute($entity, 'state_of_residence');
+	$installer->addAttribute($entity, 'state_of_residence', array(
+	    'label'				=> 'State of Residence',
+		'type'				=> 'int',
+	    'input'         	=> 'select',
+	    'source'        	=> 'dan_sca/source_state',
+	    'visible' 			=> true,
+	    'required' 			=> true,
+	    'visible_on_front' 	=> true
+	));
+	
+	$installer->removeAttribute($entity, 'color_eyes');
+	$installer->addAttribute($entity, 'color_eyes', array(
+	    'label'				=> 'Eye Color',
+		'type'				=> 'varchar',
+	    'input'         	=> 'select',
+	    'visible' 			=> true,
+	    'required' 			=> true,
+	    'visible_on_front' 	=> false,
+		'backend'    		=> 'eav/entity_attribute_backend_array',
+		'option'			=> array (
+								'values' => array(
+									'Blue' 	=> 'Blue',
+									'Brown' => 'Brown',
+									'Gray' 	=> 'Gray',
+									'Green' => 'Green',
+									'Hazel'	=> 'Hazel'
+								)
+							)
+	));
+	
+	$installer->removeAttribute($entity, 'color_hair');
+	$installer->addAttribute($entity, 'color_hair', array(
+	    'label'				=> 'Hair Color',
+		'type'				=> 'varchar',
+	    'input'         	=> 'select',
+	    'visible' 			=> true,
+	    'required' 			=> true,
+	    'visible_on_front' 	=> true,
+		'backend'    		=> 'eav/entity_attribute_backend_array',
+		'option'			=> array (
+								'values' => array(
+									'Bald' 		=> 'Bald',
+									'Black'		=> 'Black',
+									'Blond(e)'	=> 'Blond(e)',
+									'Brown'		=> 'Brown',
+									'Gray'		=> 'Gray',
+									'Red'		=> 'Red'
+								)
+							)
+	));
+	
+	// create the options for the height attribute (36 inches --> 84 inches)
+	$_num = 36;
+	$_vals = array();
+	$_opts = array();
+	while($_num < 85){
+		$_ft = floor($_num / 12);
+		$_in = $_num % 12;
+		$_vals[$_num] = (string)$_ft . '-ft ' . (string)$_in . '-in';
+		$_num++;
+	};
+	$_opts['values'] = $_vals;
+	
+	$installer->removeAttribute($entity, 'height');
+	$installer->addAttribute($entity, 'height', array(
+	    'label'				=> 'Height (inches)',
+		'type'				=> 'int',
+	    'input'         	=> 'select',
+	    'visible' 			=> true,
+	    'required' 			=> true,
+	    'visible_on_front' 	=> true,
+		'option'			=> $_opts
+	));
+
+	// make product SKU available for shopping cart price rules
+	$attributeId = Mage::getResourceModel('eav/entity_attribute')->getIdByCode('catalog_product', 'sku');
+	if ($attributeId) {
+	    $attribute = Mage::getModel('catalog/resource_eav_attribute')->load($attributeId);
+	    $attribute->setIsUsedForPromoRules(1)->save();
+	};
+	
+	
+	// create price rule for detecting presence of Membership product ==> reduce all other prices to $0.00
     $rule = Mage::getModel('salesrule/rule');
     $rule->setName('Membership Discount')
       ->setDescription('Reduce all other item prices to $0 if the shopper is in the process of buying a membership')

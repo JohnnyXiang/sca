@@ -20,16 +20,16 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Form extends Mage_Adminhtml_Block_W
                 'label' => $this->__('Abbreviation'),
                 'input' => 'text',
                 'required' => true,
+          ),
+            'requires_safety_card' => array(
+                'label' => $this->__('Requires Safety Card?'),
+   				'input' => 'select',
+   				'options' => array (
+   						1 => 'Yes',
+   						0 => 'No'
+        			),
+                'required' => true,
             ),
-   //         'requires_safety_card' => array(
-   //             'label' => $this->__('Requires Safety Card?'),
-   //				'input' => 'boolean',
-   //				'options' => array (
-   //						1 => 'Yes',
-   //						0 => 'No',
-   //     			),
-   //             'required' => true,
-   //         ),
             'convenience_fee' => array(
                 'label' => $this->__('Convenience Fee'),
                 'input' => 'text',

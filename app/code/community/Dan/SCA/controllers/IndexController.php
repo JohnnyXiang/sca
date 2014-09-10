@@ -1,6 +1,7 @@
 <?php
 class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
-    public function indexAction(){
+    
+	public function indexAction(){
         $this->loadLayout()->renderLayout();
     }
     
@@ -22,5 +23,21 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
         Mage::register('current_state', $state);
         
         $this->loadLayout()->renderLayout();
+    }
+	
+	// handler for ajax state of residence prompt / input
+    public function updateAction(){
+		$id = (int)$this->getRequest()->getParam('state_id');
+		
+		if($id){
+			Mage::getSingleton('customer/session')->setStateOfResidence($id);
+			$jsonData = json_encode(true);
+			$this->getResponse()->setHeader('Content-type', 'application/json');
+		}
+		else{
+			$jsonData = json_encode(array('data' => 'null input'));
+			$this->getResponse()->setHeader('HTTP/1.0', '501', true);
+		};
+		$this->getResponse()->setBody($jsonData);
     }
 }

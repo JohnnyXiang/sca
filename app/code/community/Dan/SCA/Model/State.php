@@ -1,6 +1,10 @@
 <?php
 class Dan_SCA_Model_State extends Mage_Core_Model_Abstract {
  
+ 	private function blah(){
+ 		
+ 	}
+ 
     protected function _construct(){
         /**
          * This tells Magento where the related resource model can be found.
@@ -36,8 +40,7 @@ class Dan_SCA_Model_State extends Mage_Core_Model_Abstract {
     }
 
     protected function _prepareUrlKey(){
-        /* Might consider ensuring that the URL Key entered is unique and contains only alphanumeric characters. */
-
+        // might consider a regex to ensure no invalid characters are used
         return $this;
     }
 }

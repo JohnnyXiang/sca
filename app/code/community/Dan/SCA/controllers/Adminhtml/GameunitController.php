@@ -18,11 +18,14 @@ class Dan_SCA_Adminhtml_GameunitController extends Mage_Adminhtml_Controller_Act
 
     /* This action handles both viewing and editing existing gameunits. */
     public function editAction(){
-        /**
-         * Retrieve existing gameunit data if an ID was specified.
-         * If not, we will have an empty gameunit entity ready to be populated.
-         */
         $gameunit = Mage::getModel('dan_sca/gameunit');
+		$state = Mage::getModel('dan_sca/state');
+		
+		// load state from url parameter and make it available to blocks
+		if($stateId = $this->getRequest()->getParam('state_id', false)){
+			$state->load($stateId);
+	        Mage::register('current_state', $state);
+		};
         
 		if($gameunitId = $this->getRequest()->getParam('id', false)) {
 			
@@ -42,9 +45,7 @@ class Dan_SCA_Adminhtml_GameunitController extends Mage_Adminhtml_Controller_Act
                 $this->_getSession()->addSuccess($this->__('The gameunit has been saved.'));
 
                 // redirect to remove $_POST data from the request
-                return $this->_redirect('dan_sca_admin/gameunit/edit', array(
-					'id' => $gameunit->getId()
-				));
+                return $this->_redirect('dan_sca_admin/state/edit', array('id' => $gameunit->getParentId()));
             } catch (Exception $e) {
                 Mage::logException($e);
                 $this->_getSession()->addError($e->getMessage());
@@ -69,12 +70,14 @@ class Dan_SCA_Adminhtml_GameunitController extends Mage_Adminhtml_Controller_Act
 
     public function deleteAction(){
         $gameunit = Mage::getModel('dan_sca/gameunit');
+		$state = Mage::getModel('dan_sca/state');
 
         if ($gameunitId = $this->getRequest()->getParam('id', false)){
 			$gameunit->load($gameunitId);
+			$state->load($gameunit->getParentId());
 		};
 
-        if ($gameunit->getId()){
+        if (!$gameunit->getId()){
 			_getSession()->addError($this->__('This gameunit no longer exists.'));
             return $this->_redirect('dan_sca_admin/gameunit/index');
 		};
@@ -87,13 +90,9 @@ class Dan_SCA_Adminhtml_GameunitController extends Mage_Adminhtml_Controller_Act
             $this->_getSession()->addError($e->getMessage());
         }
 
-        return $this->_redirect('dan_sca_admin/gameunit/index');
+        return $this->_redirect('dan_sca_admin/state/edit', array('id' => $state->getId()));
     }
 
-    /**
-     * Thanks to Ben for pointing out this method was missing. Without
-     * this method the ACL rules configured in adminhtml.xml are ignored.
-     */
     protected function _isAllowed(){
         /**
          * we include this switch to demonstrate that you can add action

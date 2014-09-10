@@ -7,5 +7,10 @@
 		<reference name="content"><!-- content block !-->
             <block type="dan_sca/adminhtml_state_edit" name="form"></block>
         </reference>
+		<!-- probably the ajax needed to handle adding/deleting
+        <reference name="js">
+            <block type="adminhtml/template" template="customer/edit/js.phtml" name="customer.edit.js" as="customer_edit_js"></block>
+        </reference>
+		!-->
     </dan_sca_adminhtml_state_edit>
 </layout>
