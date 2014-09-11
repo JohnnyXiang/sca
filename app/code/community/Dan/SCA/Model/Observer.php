@@ -3,6 +3,7 @@
 class Dan_SCA_Model_Observer{
 
 	// observer function to check if the customer purchased a membership and change their customer group if they did
+	// * also handles general page prep
     public function upgradeMember(Varien_Event_Observer $observer){
 
 		// load the just-placed order
@@ -44,6 +45,11 @@ class Dan_SCA_Model_Observer{
 		
 		$groupPricingData = array(array('website_id'=>0, 'cust_group'=>$targetGroup->getId(), 'price'=>0));
 		$product->setData('group_price', $groupPricingData);
+	}
+	
+	public function doAfterSessionClear(Varien_Event_Observer $observer){
+		$order = Mage::getModel('sales/order')->load($observer->getEvent()->getOrderIds()[0]);
+		Mage::getSingleton('customer/session')->setLastOrder($order);
 	}
 }
 

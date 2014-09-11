@@ -95,6 +95,15 @@
 	                </dan_sca>
 	            </observers>
 			</catalog_product_prepare_save>
+			<checkout_onepage_controller_success_action>
+	            <observers>
+	                <dan_sca>
+						<type>singleton</type>
+	                    <class>dan_sca/observer</class>
+	                    <method>doAfterSessionClear</method>
+	                </dan_sca>
+	            </observers>
+			</checkout_onepage_controller_success_action>
 	    </events>
 	</global>
 	

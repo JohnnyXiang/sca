@@ -1,7 +1,8 @@
 <?php
 	$installer = $this;
 	$installer->startSetup();
-	
+
+	/*
 	// create state table (non-EAV)
 	$table = new Varien_Db_Ddl_Table();
 	$table->setName($installer->getTable('dan_sca/state'));
@@ -562,10 +563,13 @@
 	Mage::getSingleton('customer/group')->setData(array('customer_group_code' => 'Members', 'tax_class_id' => 3))
 		->save();
 	
+	*/
+	
 	// add membership_date to customer entity (to track when a person upgrades)
 	$entity = $installer->getEntityTypeId('customer');
 	$customerEntities = array();
-		
+	
+	/*	
 	$installer->removeAttribute($entity, 'membership_date');
 	$installer->addAttribute($entity, 'membership_date', array(
 	    'label' 			=> 'Upgraded to Member',
@@ -593,24 +597,17 @@
 	));
 	array_push($customerEntities, 'state_of_residence');
 	
+	*/
+	
 	$installer->removeAttribute($entity, 'color_eyes');
 	$installer->addAttribute($entity, 'color_eyes', array(
 	    'label'				=> 'Eye Color',
 		'type'				=> 'varchar',
 	    'input'         	=> 'select',
+		'source'			=> 'dan_sca/source_eyes',
 	    'visible' 			=> true,
 	    'required' 			=> true,
-	    'visible_on_front' 	=> false,
-		'backend'    		=> 'eav/entity_attribute_backend_array',
-		'option'			=> array (
-								'values' => array(
-									'Blue' 	=> 'Blue',
-									'Brown' => 'Brown',
-									'Gray' 	=> 'Gray',
-									'Green' => 'Green',
-									'Hazel'	=> 'Hazel'
-								)
-							)
+	    'visible_on_front' 	=> false
 	));
 	array_push($customerEntities, 'color_eyes');
 	
@@ -619,36 +616,14 @@
 	    'label'				=> 'Hair Color',
 		'type'				=> 'varchar',
 	    'input'         	=> 'select',
+		'source'			=> 'dan_sca/source_hair',
 	    'visible' 			=> true,
 	    'required' 			=> true,
-	    'visible_on_front' 	=> true,
-		'backend'    		=> 'eav/entity_attribute_backend_array',
-		'option'			=> array (
-								'values' => array(
-									'Bald' 		=> 'Bald',
-									'Black'		=> 'Black',
-									'Blond(e)'	=> 'Blond(e)',
-									'Brown'		=> 'Brown',
-									'Gray'		=> 'Gray',
-									'Red'		=> 'Red'
-								)
-							)
+	    'visible_on_front' 	=> true
 	));
 	array_push($customerEntities, 'color_hair');
 	
-	// create the options for the height attribute (36 inches --> 84 inches)
-	$_num = 36;
-	$_vals = array();
-	$_opts = array();
-	while($_num < 85){
-		$_ft = floor($_num / 12);
-		$_in = $_num % 12;
-		$_vals[$_num] = (string)$_ft . '-ft ' . (string)$_in . '-in';
-		$_num++;
-	};
-	$_opts['values'] = $_vals;
-	
-	$installer->removeAttribute($entity, 'height');
+	// $installer->removeAttribute($entity, 'height');
 	$installer->addAttribute($entity, 'height', array(
 	    'label'				=> 'Height (inches)',
 		'type'				=> 'int',
@@ -656,11 +631,11 @@
 	    'visible' 			=> true,
 	    'required' 			=> true,
 	    'visible_on_front' 	=> true,
-		'option'			=> $_opts
+		'source'			=> 'dan_sca/source_height'
 	));
 	array_push($customerEntities, 'height');
 	
-	$installer->removeAttribute($entity, 'weight');
+	// $installer->removeAttribute($entity, 'weight');
 	$installer->addAttribute($entity, 'weight', array(
 	    'label'				=> 'Weight (lbs)',
 		'type'				=> 'int',
@@ -674,7 +649,7 @@
 	$attributeSetId   = $installer->getDefaultAttributeSetId($entity);
 	$attributeGroupId = $installer->getDefaultAttributeGroupId($entity, $attributeSetId);
 
-	foreach($customerEntities => $_ce){
+	foreach($customerEntities as $_ce){
 		$attribute = Mage::getSingleton("eav/config")->getAttribute("customer", $_ce);
 		$installer->addAttributeToGroup(
 		    $entity,
@@ -695,7 +670,7 @@
 	    $attribute->save();
 	};
 	
-	
+	/*
 	// make product SKU available for shopping cart price rules
 	$attributeId = Mage::getResourceModel('eav/entity_attribute')->getIdByCode('catalog_product', 'sku');
 	if ($attributeId) {
@@ -748,6 +723,7 @@
 
     $rule->getActions()->addCondition($actions);
     $rule->save();
-
+	*/
+	
 	$installer->endSetup();
 ?>

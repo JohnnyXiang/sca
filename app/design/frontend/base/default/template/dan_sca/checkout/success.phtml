@@ -5,12 +5,124 @@
  *		- collect additional general information on the user
  *		- collect state-specific information on the user
  */
+	$order = Mage::getSingleton('customer/session')->getLastOrder();
+	$customer = Mage::getModel('customer/customer')->load($order->getCustomerId()); 
 ?>
 <div class="page-title">
-    <h1><?php echo $this->__('Your order is all fucked up.') ?></h1>
+    <h1><?php echo $this->__("You're not quite done!") ?></h1>
 </div>
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
-<h2 class="sub-title"><?php echo $this->__('Thank you for your purchase!') ?></h2>
+<h3 class="sub-title" style="color:#B22222;"><?php echo $this->__('Are your details accurate?') ?></h3>
+<br />
+<div id='extra-details'>
+	<form id='additional_details' name='additional_details' method='POST'>
+		<div id='extra-sca-info'>
+			<h4>* Information Required by Most States *</h4>
+			<ul>
+				<?php if(!$customer->getColorEyes()): ?>
+					<li>
+						<?php 
+							$_attr = Mage::getSingleton('eav/config')->getAttribute('customer', 'color_eyes'); 
+							$_opts = $_attr->getSource()->getAllOptions();
+							$_custVal = $customer->getColorEyes();
+						?>
+					
+						<label for="color_eyes" style='width:80px; text-align:right; margin-right:5px;'>Eye Color</label>
+						<select name="color_eyes" style="width:80px;" required>
+							<?php foreach($_opts as $_opt): ?>
+								<?php $_selText = $_opt['value'] == $_custVal ? 'selected' : ''; ?>
+								<option value="<?php echo $_opt['value']; ?>" <?php echo $_selText; ?>><?php echo $_opt['label']; ?></option>
+							<?php endforeach; ?>
+						</select>
+					</li>
+				<?php endif; ?>
+				<li>
+					<?php 
+						$_attr = Mage::getSingleton('eav/config')->getAttribute('customer', 'color_hair'); 
+						$_opts = $_attr->getSource()->getAllOptions();
+						$_custVal = $customer->getColorHair();
+					?>
+					
+					<label for="color_hair" style='width:80px; text-align:right; margin-right:5px;'>Hair Color</label>
+					<select name="color_hair" style="width:80px;" required>
+						<?php foreach($_opts as $_opt): ?>
+							<?php $_selText = $_opt['value'] == $_custVal ? 'selected' : ''; ?>
+							<option value="<?php echo $_opt['value']; ?>" <?php echo $_selText; ?>><?php echo $_opt['label']; ?></option>
+						<?php endforeach; ?>
+					</select>		
+				</li>
+				<li>
+					<?php 
+						$_attr = Mage::getSingleton('eav/config')->getAttribute('customer', 'height'); 
+						$_opts = $_attr->getSource()->getAllOptions();
+						$_custVal = $customer->getHeight();
+					?>
+					<label for="height" style='width:80px; text-align:right; margin-right:5px;'>Height (in)</label>
+					<select name="height" style="width:80px;" required>
+						<?php foreach($_opts as $_opt): ?>
+							<?php $_selText = $_opt['value'] == $_custVal ? 'selected' : ''; ?>
+							<option value="<?php echo $_opt['value']; ?>" <?php echo $_selText; ?>><?php echo $_opt['label']; ?></option>
+						<?php endforeach; ?>
+					</select>		
+				</li>
+				<li>
+					<label for="weight" style='width:80px; text-align:right; margin-right:5px;'>Weight (lbs)</label>
+					<input type="number" name="weight" min="0" style="width:60px; margin-right:20px;" <?php if($_custVal = $customer->getWeight()): echo 'value="'. $_custVal .'"'; endif; ?> placeholder="190" required>
+				</li>
+				<?php if(!$customer->getGender()): ?>
+				<li>
+					<label for="gender" style='width:80px; text-align:right; margin-right:5px;'>Gender</label>
+					<select name="gender" required>
+						<option value="Male">Male</option>
+						<option value="Female">Female</option>
+					</select>		
+				</li>
+				<?php endif; ?>
+				<?php if(!$customer->getDob()): ?>
+				<li>
+					<label for="birthdate" style='width:80px; text-align:right; margin-right:5px;'>Birthdate</label>
+					<input type="date" name="birthdate" required>
+				</li>
+				<?php endif; ?>
+			</ul>
+		</div>
+	
+		<div id='extra-state-info'>
+		<?php $items = $order->getAllItems(); ?>
+		<?php foreach($items as $_item): ?>
+			<?php 	$__item = $_item->getProduct()->getId(); 
+					$_resource = $_item->getProduct()->getResource();
+					$_stateId = $_resource->getAttributeRawValue($__item, 'state_id', Mage::app()->getStore()); 
+					$_state = Mage::getModel('dan_sca/state');
+					$_state->load($_stateId);
+					$_collection = Mage::getModel('dan_sca/state_info')->getCollection();
+					$_collection->getSelect()->where('main_table.parent_id = '. $_stateId);
+			?>
+			<?php if($_collection->count()): ?>
+				<br />
+				<h4>-- <?php echo $_state->getName(); ?> --</h4>
+				<ul>
+				<?php foreach($_collection as $_info): ?>
+					<?php $_attrCode = $_info->getAttributeCode(); ?>
+					<?php $_custVal = $customer->getData($_attrCode); ?>
+					<?php $_inputType = $_info->getInputType(); ?>
+					<li>
+						<label for="<?php echo $_attrCode; ?>" style='width:120px; text-align:right; margin-right:5px;'><?php echo $_info->getName(); ?></label>
+						<input type="<?php echo $_inputType; ?>" style="width:150px;" name="<?php echo $_attrCode; ?>" value="<?php echo $_custVal; ?>" <?php echo $_info->getIsRequired() ? required : '' ?>><?php if($_info->getIsRequired()): ?><span style='margin-left:5px; color:red;'>required</span><?php endif; ?>
+					</li>
+				<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		<?php endforeach; ?>
+		</div>
+		<br />
+		<input class="button" type="submit" value="Submit">
+	</form>
+</div>
+
+<br />
+<br />
+
 
 <?php if ($this->getOrderId()):?>
 <?php if ($this->getCanViewOrder()) :?>
