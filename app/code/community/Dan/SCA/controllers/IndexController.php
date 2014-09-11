@@ -44,38 +44,63 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 	// handler for ajax post-checkout details update
     public function updateDetailsAction(){
 		
-		$postData = $this->getRequest()->getParams();
+		$error = true;
 		
-		// retrieve customer
-		$order = Mage::getSingleton('customer/session')->getLastOrder();
-		$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-		
-		if($customer->getUpdateToken() == $postData['key']){
+		if($postData = $this->getRequest()->getParams()){
 			
-			// remove the key value so that we don't attempt to save it as a customer attribute
-			unset($postData['key']);
+			if($custId = $postData['id']){
+				
+				if($customer = Mage::getModel('customer/customer')->load($custId)){
 
-			foreach($postData as $_attr => $_val){
-				$customer->setData($_attr, $_val);
+					if($customer->getUpdateToken() == $postData['key']){
+
+						// remove these value so that we don't attempt to save it as a customer attribute
+						unset($postData['key']);
+						unset($postData['id']);
+
+						foreach($postData as $_attr => $_val){
+							$customer->setData($_attr, $_val);
+						};
+
+						try {
+							$customer->setData('update_token', 'used');
+							$customer->save();
+							$jsonData = json_encode(true);
+							$error = false;
+						}
+						catch(Exception $e){
+							Mage::logException($e);
+							$jsonData = json_encode($e->getMessage());
+						}
+					}
+					else{
+						Mage::logException('invalid token detected');
+						$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
+					};
+				}
+				else{
+					Mage::logException('invalid customer provided');
+					$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
+				};
 			}
-		
-	        try {
-	            $customer->save();
-				$jsonData = json_encode(true);
-				$this->getResponse()->setHeader('Content-type', 'application/json');
-				$this->getResponse()->setBody($jsonData);
-	        } catch (Exception $e) {
-	            Mage::logException($e);
-	            $jsonData = json_encode($e->getMessage());
-				$this->getResponse()->setHeader('HTTP/1.0', '501', true);
-				$this->getResponse()->setBody($jsonData);
-	        }
+			else{
+				Mage::logException('no id provided');
+				$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
+			};
 		}
 		else{
-			Mage::logException('malicious attempt detected');
-			$jsonData = json_encode(array('data' => 'malicious attempt detected'));
-			$this->getResponse()->setHeader('HTTP/1.0', '502', true);
+			Mage::logException('update parameters not supplied');
+			$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
+		};
+		
+		// return result
+		if(!$error){
+			$this->getResponse()->setHeader('Content-type', 'application/json');
 			$this->getResponse()->setBody($jsonData);
 		}
+		else{
+			$this->getResponse()->setHeader('HTTP/1.0', '501', true);
+			$this->getResponse()->setBody($jsonData);
+		};
     }
 }

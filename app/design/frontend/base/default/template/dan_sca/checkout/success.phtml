@@ -10,7 +10,7 @@
 	$_existing = $customer->getColorEyes() ? 'still' : '';
 ?>
 <div class="page-title">
-    <h1 id='status'><?php echo $this->__("Success ... but you're not quite done!") ?></h1>
+    <h1 id='status'><?php echo $this->__("Success ... but you're not done!") ?></h1>
 </div>
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
 <h3 id='status-note' class="sub-title" style="color:#B22222;"><?php echo $this->__('Are your details '. $_existing .' accurate?'); ?></h3>
@@ -76,8 +76,8 @@
 				<li>
 					<label for="gender" style='width:80px; text-align:right; margin-right:5px;'>Gender</label>
 					<select name="gender" required>
-						<option value="Male">Male</option>
-						<option value="Female">Female</option>
+						<option value="1">Male</option>
+						<option value="2">Female</option>
 					</select>		
 				</li>
 				<?php endif; ?>
@@ -101,7 +101,7 @@
 					$_collection = Mage::getModel('dan_sca/state_info')->getCollection();
 					$_collection->getSelect()->where('main_table.parent_id = '. $_stateId);
 			?>
-			<?php if($_collection->count()): ?>
+			<?php if(count($_collection)): ?>
 				<br />
 				<h4>-- <?php echo $_state->getName(); ?> --</h4>
 				<ul>

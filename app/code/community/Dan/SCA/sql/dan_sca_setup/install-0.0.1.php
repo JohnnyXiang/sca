@@ -2,7 +2,7 @@
 	$installer = $this;
 	$installer->startSetup();
 
-	/*
+
 	// create state table (non-EAV)
 	$table = new Varien_Db_Ddl_Table();
 	$table->setName($installer->getTable('dan_sca/state'));
@@ -505,7 +505,7 @@
 
 	
 	// add state_id attribute to products
-	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id');
+	// $this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'state_id', array(
 		'attribute_set' => 'Draw Entry',
 	    'label'         => 'State',
@@ -517,7 +517,7 @@
 	));
 	
 	// add animal_id attribute to products
-	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id');
+	// $this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id', array(
 		'attribute_set' => 'Draw Entry',
 	    'label'         => 'Animal',
@@ -529,21 +529,21 @@
 		'user_defined'	=> true 
 	));
 
-	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_resident');
+	// $this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_resident');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_resident', array(
 		'attribute_set' => 'Draw Entry',
 	    'label'         => 'Resident Fee',
 	    'input'         => 'price',
-		'type'			=> 'dec',
+		'type'			=> 'decimal',
 		'user_defined'	=> true 
 	));
 	
-	$this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_non_resident');
+	// $this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_non_resident');
 	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'fee_non_resident', array(
 		'attribute_set' => 'Draw Entry',
 	    'label'         => 'Non-Resident Fee',
 	    'input'         => 'price',
-		'type'			=> 'dec',
+		'type'			=> 'decimal',
 		'user_defined'	=> true 
 	));
 	
@@ -563,14 +563,13 @@
 	Mage::getSingleton('customer/group')->setData(array('customer_group_code' => 'Members', 'tax_class_id' => 3))
 		->save();
 	
-	*/
-	
+
 	// add membership_date to customer entity (to track when a person upgrades)
 	$entity = $installer->getEntityTypeId('customer');
 	$customerEntities = array();
 	
-	/*	
-	$installer->removeAttribute($entity, 'membership_date');
+
+	// $installer->removeAttribute($entity, 'membership_date');
 	$installer->addAttribute($entity, 'membership_date', array(
 	    'label' 			=> 'Upgraded to Member',
 		'input' 			=> 'date',
@@ -599,7 +598,7 @@
 	$customerEntities['state_of_residence'] = array('customer_account_create', 'customer_account_edit', 'adminhtml_customer');
 
 	
-	$installer->removeAttribute($entity, 'color_eyes');
+	// $installer->removeAttribute($entity, 'color_eyes');
 	$installer->addAttribute($entity, 'color_eyes', array(
 	    'label'				=> 'Eye Color',
 		'type'				=> 'varchar',
@@ -611,7 +610,7 @@
 	));
 	$customerEntities['color_eyes'] = array('customer_account_create', 'adminhtml_customer');
 	
-	$installer->removeAttribute($entity, 'color_hair');
+	// $installer->removeAttribute($entity, 'color_hair');
 	$installer->addAttribute($entity, 'color_hair', array(
 	    'label'				=> 'Hair Color',
 		'type'				=> 'varchar',
@@ -623,7 +622,7 @@
 	));
 	$customerEntities['color_hair'] = array('customer_account_create', 'adminhtml_customer', 'customer_account_edit');
 	
-	$installer->removeAttribute($entity, 'height');
+	// $installer->removeAttribute($entity, 'height');
 	$installer->addAttribute($entity, 'height', array(
 	    'label'				=> 'Height (inches)',
 		'type'				=> 'int',
@@ -635,7 +634,7 @@
 	));
 	$customerEntities['height'] = array('customer_account_create', 'adminhtml_customer', 'customer_account_edit');
 	
-	$installer->removeAttribute($entity, 'weight');
+	// $installer->removeAttribute($entity, 'weight');
 	$installer->addAttribute($entity, 'weight', array(
 	    'label'				=> 'Weight (lbs)',
 		'type'				=> 'int',
@@ -645,9 +644,9 @@
 	    'visible_on_front' 	=> true
 	));
 	$customerEntities['weight'] = array('customer_account_create', 'adminhtml_customer', 'customer_account_edit');
-	*/
+
 	
-	$installer->removeAttribute($entity, 'poa_on_file');
+	// $installer->removeAttribute($entity, 'poa_on_file');
 	$installer->addAttribute($entity, 'poa_on_file', array(
 	    'label'				=> 'Power of Attorney On-file?',
 		'type' 				=> 'int',
@@ -661,7 +660,7 @@
 	));
 	$customerEntities['poa_on_file'] = array('adminhtml_customer');
 	
-	$installer->removeAttribute($entity, 'update_token');
+	// $installer->removeAttribute($entity, 'update_token');
 	$installer->addAttribute($entity, 'update_token', array(
 	    'label'				=> 'Post-Checkout Update Token',
 		'type' 				=> 'varchar',
@@ -701,6 +700,7 @@
 	    $attribute = Mage::getModel('catalog/resource_eav_attribute')->load($attributeId);
 	    $attribute->setIsUsedForPromoRules(1)->save();
 	};
+	*/
 	
 	
 	// create price rule for detecting presence of Membership product ==> reduce all other prices to $0.00
@@ -747,10 +747,6 @@
 
     $rule->getActions()->addCondition($actions);
     $rule->save();
-	
-	// *** consider adding an index to the 'notes' field of the eav/attribute table ... might need to search on this
-	
-	*/
 	
 	$installer->endSetup();
 ?>
