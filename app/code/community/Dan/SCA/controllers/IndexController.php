@@ -26,7 +26,7 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
     }
 	
 	// handler for ajax state of residence prompt / input
-    public function updateAction(){
+    public function updateResidenceAction(){
 		$id = (int)$this->getRequest()->getParam('state_id');
 		
 		if($id){
@@ -39,5 +39,43 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 			$this->getResponse()->setHeader('HTTP/1.0', '501', true);
 		};
 		$this->getResponse()->setBody($jsonData);
+    }
+	
+	// handler for ajax post-checkout details update
+    public function updateDetailsAction(){
+		
+		$postData = $this->getRequest()->getParams();
+		
+		// retrieve customer
+		$order = Mage::getSingleton('customer/session')->getLastOrder();
+		$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+		
+		if($customer->getUpdateToken() == $postData['key']){
+			
+			// remove the key value so that we don't attempt to save it as a customer attribute
+			unset($postData['key']);
+
+			foreach($postData as $_attr => $_val){
+				$customer->setData($_attr, $_val);
+			}
+		
+	        try {
+	            $customer->save();
+				$jsonData = json_encode(true);
+				$this->getResponse()->setHeader('Content-type', 'application/json');
+				$this->getResponse()->setBody($jsonData);
+	        } catch (Exception $e) {
+	            Mage::logException($e);
+	            $jsonData = json_encode($e->getMessage());
+				$this->getResponse()->setHeader('HTTP/1.0', '501', true);
+				$this->getResponse()->setBody($jsonData);
+	        }
+		}
+		else{
+			Mage::logException('malicious attempt detected');
+			$jsonData = json_encode(array('data' => 'malicious attempt detected'));
+			$this->getResponse()->setHeader('HTTP/1.0', '502', true);
+			$this->getResponse()->setBody($jsonData);
+		}
     }
 }

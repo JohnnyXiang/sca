@@ -6,16 +6,19 @@
  *		- collect state-specific information on the user
  */
 	$order = Mage::getSingleton('customer/session')->getLastOrder();
-	$customer = Mage::getModel('customer/customer')->load($order->getCustomerId()); 
+	$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+	$_existing = $customer->getColorEyes() ? 'still' : '';
 ?>
 <div class="page-title">
-    <h1><?php echo $this->__("You're not quite done!") ?></h1>
+    <h1 id='status'><?php echo $this->__("Success ... but you're not quite done!") ?></h1>
 </div>
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
-<h3 class="sub-title" style="color:#B22222;"><?php echo $this->__('Are your details accurate?') ?></h3>
+<h3 id='status-note' class="sub-title" style="color:#B22222;"><?php echo $this->__('Are your details '. $_existing .' accurate?'); ?></h3>
+<br />
+<h4 id='status-note-extra' class="sub-title" style="color:red; display:none;"></h4>
 <br />
 <div id='extra-details'>
-	<form id='additional_details' name='additional_details' method='POST'>
+	<form action="<?php echo $this->getUrl('dan_sca/index/updateDetails'); ?>" method="POST" id="additional_details" name="additional_details">
 		<div id='extra-sca-info'>
 			<h4>* Information Required by Most States *</h4>
 			<ul>
@@ -116,14 +119,12 @@
 		<?php endforeach; ?>
 		</div>
 		<br />
-		<input class="button" type="submit" value="Submit">
+		<input type="hidden" name="key" value="<?php echo $customer->getUpdateToken(); ?>">
+		<input id='btn-submitForm' class="button" type="submit" value="Submit">
 	</form>
+	<br />
+	<br />
 </div>
-
-<br />
-<br />
-
-
 <?php if ($this->getOrderId()):?>
 <?php if ($this->getCanViewOrder()) :?>
     <p><?php echo $this->__('Your order # is: %s.', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getViewOrderUrl()), $this->escapeHtml($this->getOrderId()))) ?></p>
@@ -156,3 +157,38 @@
 <div class="buttons-set">
     <button type="button" class="button" title="<?php echo $this->__('Continue Shopping') ?>" onclick="window.location='<?php echo $this->getUrl() ?>'"><span><span><?php echo $this->__('Continue Shopping') ?></span></span></button>
 </div>
+
+
+
+<script>
+	(function ($) {
+		$("#additional_details").submit(function(e){
+			
+			// prep ajax data
+	    	var postData = $(this).serializeArray();
+	    	var formURL = $(this).attr("action");
+			
+			// disable submit button to prevent double submits
+			$('#btn-submitForm').attr("disabled", "disabled");
+			
+			// ajax submit
+			jQuery.ajax({
+				url : formURL,
+				type: "POST",
+				data : postData,
+				success: function(data, textStatus, jqXHR){
+	            	$('#status').text('Thank you!');
+					$('#status-note').css('color','#006400').text('Your details have been updated!');
+					$('#extra-details').fadeOut(750);
+					<?php if(!$customer->getPoaOnFile()): ?>
+						$('#status-note-extra').text('We will process your applications once we receive your signed Power of Attorney!').fadeIn(850);
+					<?php endif; ?>
+				},
+	        	error: function(jqXHR, textStatus, errorThrown){
+	            	alert('Please check your data');     
+	        	}
+	    	});
+			e.preventDefault();
+		});
+	}(jQuery));
+</script>

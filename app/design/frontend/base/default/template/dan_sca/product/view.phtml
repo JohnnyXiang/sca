@@ -48,7 +48,7 @@
 	$attributeSetName = $attributeSet->getAttributeSetName();
 	
 	$gameunitOptions = $attributeSetName == 'Draw Entry' ? 1 : 0;
-
+	
 	// if the product is a draw entry (has gameunitOptions), then determine if we have the user's state of residence
 	if($gameunitOptions){
 		$popup = true;
@@ -246,7 +246,7 @@
 		<div id='residence_popup' style='padding:10px; margin:20px; background-color: lightgrey; text-align:center;'> 
 			<h2>Select your State of Residence</h2>
 			<p>State fees can vary greatly depending on where you live. <br /><br />In order to see the most-accurate fees, please enter your current state of residence</p>
-			<form action="<?php echo $this->getUrl('dan_sca/index/update'); ?>" method="POST" id="residenceForm" name="residenceForm">
+			<form action="<?php echo $this->getUrl('dan_sca/index/updateResidence'); ?>" method="POST" id="residenceForm" name="residenceForm">
 				<select name='state_id'>
 					<option value='0'>-- Select State --</option>
 					<?php foreach($collection as $_c): ?>

@@ -582,10 +582,11 @@
 	    'user_defined' 		=> true,
 	    'visible_on_front' 	=> false
 	));
-	array_push($customerEntities, 'membership_date');
+	$customerEntities['membership_date'] = array('adminhtml_customer');
 	
-	// *** untested
-	$installer->removeAttribute($entity, 'state_of_residence');
+	
+
+	// $installer->removeAttribute($entity, 'state_of_residence');
 	$installer->addAttribute($entity, 'state_of_residence', array(
 	    'label'				=> 'State of Residence',
 		'type'				=> 'int',
@@ -595,9 +596,8 @@
 	    'required' 			=> true,
 	    'visible_on_front' 	=> true
 	));
-	array_push($customerEntities, 'state_of_residence');
-	
-	*/
+	$customerEntities['state_of_residence'] = array('customer_account_create', 'customer_account_edit', 'adminhtml_customer');
+
 	
 	$installer->removeAttribute($entity, 'color_eyes');
 	$installer->addAttribute($entity, 'color_eyes', array(
@@ -609,7 +609,7 @@
 	    'required' 			=> true,
 	    'visible_on_front' 	=> false
 	));
-	array_push($customerEntities, 'color_eyes');
+	$customerEntities['color_eyes'] = array('customer_account_create', 'adminhtml_customer');
 	
 	$installer->removeAttribute($entity, 'color_hair');
 	$installer->addAttribute($entity, 'color_hair', array(
@@ -621,9 +621,9 @@
 	    'required' 			=> true,
 	    'visible_on_front' 	=> true
 	));
-	array_push($customerEntities, 'color_hair');
+	$customerEntities['color_hair'] = array('customer_account_create', 'adminhtml_customer', 'customer_account_edit');
 	
-	// $installer->removeAttribute($entity, 'height');
+	$installer->removeAttribute($entity, 'height');
 	$installer->addAttribute($entity, 'height', array(
 	    'label'				=> 'Height (inches)',
 		'type'				=> 'int',
@@ -633,9 +633,9 @@
 	    'visible_on_front' 	=> true,
 		'source'			=> 'dan_sca/source_height'
 	));
-	array_push($customerEntities, 'height');
+	$customerEntities['height'] = array('customer_account_create', 'adminhtml_customer', 'customer_account_edit');
 	
-	// $installer->removeAttribute($entity, 'weight');
+	$installer->removeAttribute($entity, 'weight');
 	$installer->addAttribute($entity, 'weight', array(
 	    'label'				=> 'Weight (lbs)',
 		'type'				=> 'int',
@@ -644,23 +644,47 @@
 	    'required' 			=> true,
 	    'visible_on_front' 	=> true
 	));
-	array_push($customerEntities, 'weight');
+	$customerEntities['weight'] = array('customer_account_create', 'adminhtml_customer', 'customer_account_edit');
+	*/
 	
+	$installer->removeAttribute($entity, 'poa_on_file');
+	$installer->addAttribute($entity, 'poa_on_file', array(
+	    'label'				=> 'Power of Attorney On-file?',
+		'type' 				=> 'int',
+	    'input' 			=> 'boolean',
+	    'global' 			=> Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL,
+	    'visible' 			=> true,
+	    'required' 			=> true,
+	    'visible_on_front' 	=> true,
+		'user_defined' 		=> true,
+	    'filterable' 		=> true
+	));
+	$customerEntities['poa_on_file'] = array('adminhtml_customer');
+	
+	$installer->removeAttribute($entity, 'update_token');
+	$installer->addAttribute($entity, 'update_token', array(
+	    'label'				=> 'Post-Checkout Update Token',
+		'type' 				=> 'varchar',
+	    'input' 			=> 'text',
+		'user_defined' 		=> true,
+		'required' 			=> false
+	));
+	$customerEntities['update_token'] = array('adminhtml_customer');
+
 	$attributeSetId   = $installer->getDefaultAttributeSetId($entity);
 	$attributeGroupId = $installer->getDefaultAttributeGroupId($entity, $attributeSetId);
 
-	foreach($customerEntities as $_ce){
-		$attribute = Mage::getSingleton("eav/config")->getAttribute("customer", $_ce);
+	foreach($customerEntities as $_attr => $used_in_forms){
+		$attribute = Mage::getSingleton("eav/config")->getAttribute("customer", $_attr);
+		
 		$installer->addAttributeToGroup(
 		    $entity,
 		    $attributeSetId,
 		    $attributeGroupId,
-		    $_ce,
+		    $_attr,
 		    '999'
 		);
 
-		$used_in_forms=array();
-		$used_in_forms[]="adminhtml_customer";
 		$attribute->setData("used_in_forms", $used_in_forms)
 	            ->setData("is_used_for_customer_segment", true)
 	            ->setData("is_system", 0)
@@ -723,6 +747,9 @@
 
     $rule->getActions()->addCondition($actions);
     $rule->save();
+	
+	// *** consider adding an index to the 'notes' field of the eav/attribute table ... might need to search on this
+	
 	*/
 	
 	$installer->endSetup();
