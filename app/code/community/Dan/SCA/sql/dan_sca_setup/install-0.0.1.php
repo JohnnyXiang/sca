@@ -564,7 +564,8 @@
 	
 	// add membership_date to customer entity (to track when a person upgrades)
 	$entity = $installer->getEntityTypeId('customer');
-	
+	$customerEntities = array();
+		
 	$installer->removeAttribute($entity, 'membership_date');
 	$installer->addAttribute($entity, 'membership_date', array(
 	    'label' 			=> 'Upgraded to Member',
@@ -577,6 +578,7 @@
 	    'user_defined' 		=> true,
 	    'visible_on_front' 	=> false
 	));
+	array_push($customerEntities, 'membership_date');
 	
 	// *** untested
 	$installer->removeAttribute($entity, 'state_of_residence');
@@ -589,6 +591,7 @@
 	    'required' 			=> true,
 	    'visible_on_front' 	=> true
 	));
+	array_push($customerEntities, 'state_of_residence');
 	
 	$installer->removeAttribute($entity, 'color_eyes');
 	$installer->addAttribute($entity, 'color_eyes', array(
@@ -609,6 +612,7 @@
 								)
 							)
 	));
+	array_push($customerEntities, 'color_eyes');
 	
 	$installer->removeAttribute($entity, 'color_hair');
 	$installer->addAttribute($entity, 'color_hair', array(
@@ -630,6 +634,7 @@
 								)
 							)
 	));
+	array_push($customerEntities, 'color_hair');
 	
 	// create the options for the height attribute (36 inches --> 84 inches)
 	$_num = 36;
@@ -653,7 +658,44 @@
 	    'visible_on_front' 	=> true,
 		'option'			=> $_opts
 	));
+	array_push($customerEntities, 'height');
+	
+	$installer->removeAttribute($entity, 'weight');
+	$installer->addAttribute($entity, 'weight', array(
+	    'label'				=> 'Weight (lbs)',
+		'type'				=> 'int',
+	    'input'         	=> 'text',
+	    'visible' 			=> true,
+	    'required' 			=> true,
+	    'visible_on_front' 	=> true
+	));
+	array_push($customerEntities, 'weight');
+	
+	$attributeSetId   = $installer->getDefaultAttributeSetId($entity);
+	$attributeGroupId = $installer->getDefaultAttributeGroupId($entity, $attributeSetId);
 
+	foreach($customerEntities => $_ce){
+		$attribute = Mage::getSingleton("eav/config")->getAttribute("customer", $_ce);
+		$installer->addAttributeToGroup(
+		    $entity,
+		    $attributeSetId,
+		    $attributeGroupId,
+		    $_ce,
+		    '999'
+		);
+
+		$used_in_forms=array();
+		$used_in_forms[]="adminhtml_customer";
+		$attribute->setData("used_in_forms", $used_in_forms)
+	            ->setData("is_used_for_customer_segment", true)
+	            ->setData("is_system", 0)
+	            ->setData("is_user_defined", 1)
+	            ->setData("is_visible", 1)
+	            ->setData("sort_order", 100);
+	    $attribute->save();
+	};
+	
+	
 	// make product SKU available for shopping cart price rules
 	$attributeId = Mage::getResourceModel('eav/entity_attribute')->getIdByCode('catalog_product', 'sku');
 	if ($attributeId) {
