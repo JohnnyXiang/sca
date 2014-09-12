@@ -27,10 +27,13 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 	
 	// handler for ajax state of residence prompt / input
     public function updateResidenceAction(){
-		$id = (int)$this->getRequest()->getParam('state_id');
-		
-		if($id){
-			Mage::getSingleton('customer/session')->setStateOfResidence($id);
+
+		if($id = (int)$this->getRequest()->getParam('state_id')){
+			
+			// we set directly on the customer object so that if the user registers during checkout, the value will be persisted & saved before the session->clear()
+			$customerSession = Mage::getSingleton('customer/session');
+			$customerSession->getCustomer()->setStateOfResidence($id);
+			
 			$jsonData = json_encode(true);
 			$this->getResponse()->setHeader('Content-type', 'application/json');
 		}
@@ -47,11 +50,8 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 		$error = true;
 		
 		if($postData = $this->getRequest()->getParams()){
-			
 			if($custId = $postData['id']){
-				
 				if($customer = Mage::getModel('customer/customer')->load($custId)){
-
 					if($customer->getUpdateToken() == $postData['key']){
 
 						// remove these value so that we don't attempt to save it as a customer attribute
@@ -63,7 +63,7 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 						};
 
 						try {
-							$customer->setData('update_token', 'used');
+							$customer->setData('update_token', Mage::helper('dan_sca')->getSecretKey());
 							$customer->save();
 							$jsonData = json_encode(true);
 							$error = false;

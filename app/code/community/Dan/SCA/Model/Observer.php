@@ -6,13 +6,13 @@ class Dan_SCA_Model_Observer{
 	// * also handles general page prep for the success page
     public function upgradeMember(Varien_Event_Observer $observer){
 
-		// load the just-placed order
+		// load the just-placed order and get its customer
 		$order_id = $observer->getEvent()->getOrder()->getId();
         $order = Mage::getModel('sales/order')->load($order_id);
 		$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
 		
 		// set the one-time, post-checkout update token
-		$customer->setUpdateToken($this->getSecretKey());
+		$customer->setUpdateToken(Mage::helper('dan_sca')->getSecretKey());
 		
 		// get all the order's items
         $items = $order->getAllItems();
@@ -51,23 +51,18 @@ class Dan_SCA_Model_Observer{
 		$product->setData('group_price', $groupPricingData);
 	}
 	
-	public function doAfterSessionClear(Varien_Event_Observer $observer){
+	public function repopulateSessionOrder(Varien_Event_Observer $observer){
 		$order = Mage::getModel('sales/order')->load($observer->getEvent()->getOrderIds()[0]);
 		Mage::getSingleton('customer/session')->setLastOrder($order);
 	}
 	
-    private function getSecretKey($controller = null, $action = null){
-        $salt = Mage::getSingleton('core/session')->getFormKey();
-		
-		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-		$string = '';
-		 for ($i = 0; $i < 10; $i++) {
-		      $string .= $characters[rand(0, strlen($characters) - 1)];
-		 }
-
-        $secret = $string . $salt;
-        return (string)Mage::helper('core')->getHash($secret);
-    }
+	public function stuffResidence(Varien_Event_Observer $observer){
+		if($state_id = Mage::getSingleton('customer/session')->getStateOfResidence()){
+			$customer = $observer->getCustomer();
+			$customer->setStateOfResidence($state_id);
+			$customer->save();
+		};
+	}
 }
 
 ?>

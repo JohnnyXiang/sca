@@ -119,6 +119,7 @@
 		<?php endforeach; ?>
 		</div>
 		<br />
+		<input type="hidden" name="id" value="<?php echo $order->getCustomerId(); ?>">
 		<input type="hidden" name="key" value="<?php echo $customer->getUpdateToken(); ?>">
 		<input id='btn-submitForm' class="button" type="submit" value="Submit">
 	</form>

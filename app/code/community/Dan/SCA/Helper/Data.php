@@ -42,5 +42,18 @@
 			
 	        return $collection;
 	    }
+		
+	    public function getSecretKey($controller = null, $action = null){
+	        $salt = Mage::getSingleton('core/session')->getFormKey();
+		
+			$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+			$string = '';
+			 for ($i = 0; $i < 10; $i++) {
+			      $string .= $characters[rand(0, strlen($characters) - 1)];
+			 }
+
+	        $secret = $string . $salt;
+	        return (string)Mage::helper('core')->getHash($secret);
+	    }
 	}
 ?>

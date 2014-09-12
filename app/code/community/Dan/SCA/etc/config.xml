@@ -100,10 +100,28 @@
 	                <dan_sca>
 						<type>singleton</type>
 	                    <class>dan_sca/observer</class>
-	                    <method>doAfterSessionClear</method>
+	                    <method>repopulateSessionOrder</method>
 	                </dan_sca>
 	            </observers>
 			</checkout_onepage_controller_success_action>
+			<customer_login>
+	            <observers>
+	                <dan_sca>
+						<type>singleton</type>
+	                    <class>dan_sca/observer</class>
+	                    <method>stuffResidence</method>
+	                </dan_sca>
+	            </observers>				
+			</customer_login>
+			<customer_register_success>
+	            <observers>
+	                <dan_sca>
+						<type>singleton</type>
+	                    <class>dan_sca/observer</class>
+	                    <method>stuffResidence</method>
+	                </dan_sca>
+	            </observers>					
+			</customer_register_success>
 	    </events>
 	</global>
 	
