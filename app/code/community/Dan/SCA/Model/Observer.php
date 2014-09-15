@@ -3,7 +3,7 @@
 class Dan_SCA_Model_Observer{
 
 	// observer function to check if the customer purchased a membership and change their customer group if they did
-	// * also handles general page prep for the success page
+	// * also handles prep for the success page
     public function upgradeMember(Varien_Event_Observer $observer){
 
 		// load the just-placed order and get its customer
@@ -55,6 +55,15 @@ class Dan_SCA_Model_Observer{
 	public function repopulateSessionOrder(Varien_Event_Observer $observer){
 		$order = Mage::getModel('sales/order')->load($observer->getEvent()->getOrderIds()[0]);
 		Mage::getSingleton('customer/session')->setLastOrder($order);
+		$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+		
+		// prep for dispatch system
+		$order->setState('processing');
+		if($customer->getPoaOnFile())
+			$order->setStatus('ready');
+		else
+			$order->setStatus('no_poa');
+		$order->save();
 	}
 	
 	public function stuffResidence(Varien_Event_Observer $observer){

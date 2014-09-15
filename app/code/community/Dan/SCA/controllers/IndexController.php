@@ -75,22 +75,22 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 						}
 					}
 					else{
-						Mage::logException('invalid token detected');
+						Mage::log('invalid token detected');
 						$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
 					};
 				}
 				else{
-					Mage::logException('invalid customer provided');
+					Mage::log('invalid customer provided');
 					$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
 				};
 			}
 			else{
-				Mage::logException('no id provided');
+				Mage::log('no id provided');
 				$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
 			};
 		}
 		else{
-			Mage::logException('update parameters not supplied');
+			Mage::log('update parameters not supplied');
 			$jsonData = json_encode(array('data' => 'an invalid value was supplied'));
 		};
 		

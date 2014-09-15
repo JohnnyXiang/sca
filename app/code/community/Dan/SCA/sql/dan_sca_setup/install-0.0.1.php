@@ -715,10 +715,10 @@
 	        'label'
 	    ),
 	    array(
-			array('status' => 'no_poa', 'label' => 'Power of Attorney not yet received'),
+			array('status' => 'no_poa', 'label' => 'Awaiting Power of Attorney'),
 	        array('status' => 'errors_us', 'label' => 'Processing'),
-	        array('status' => 'errors_them', 'label' => 'Errors requiring your correction'),
-			array('status' => 'ready', 'label' => 'Loaded in processing queue')
+	        array('status' => 'errors_them', 'label' => 'Errors requiring correction'),
+			array('status' => 'ready', 'label' => 'Queued for Processing')
 	    )
 	);
  
