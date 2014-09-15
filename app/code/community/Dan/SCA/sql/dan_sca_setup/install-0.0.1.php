@@ -2,7 +2,7 @@
 	$installer = $this;
 	$installer->startSetup();
 
-
+	/*
 	// create state table (non-EAV)
 	$table = new Varien_Db_Ddl_Table();
 	$table->setName($installer->getTable('dan_sca/state'));
@@ -700,8 +700,86 @@
 	    $attribute = Mage::getModel('catalog/resource_eav_attribute')->load($attributeId);
 	    $attribute->setIsUsedForPromoRules(1)->save();
 	};
-	*/
+
 	
+	*/
+
+// add our order statues
+	$statusTable = $installer->getTable('sales/order_status');
+	$statusStateTable = $installer->getTable('sales/order_status_state');
+	
+	$installer->getConnection()->insertArray(
+	    $statusTable,
+	    array(
+	        'status',
+	        'label'
+	    ),
+	    array(
+			array('status' => 'no_poa', 'label' => 'Power of Attorney not yet received'),
+	        array('status' => 'errors_us', 'label' => 'Processing'),
+	        array('status' => 'errors_them', 'label' => 'Errors requiring your correction'),
+			array('status' => 'ready', 'label' => 'Loaded in processing queue')
+	    )
+	);
+ 
+	// Insert states and mapping of statuses to states
+	$installer->getConnection()->insertArray(
+	    $statusStateTable,
+	    array(
+	        'status',
+	        'state',
+	        'is_default'
+	    ),
+	    array(
+	        array(
+	            'status' => 'errors_us',
+	            'state' => 'processing',
+	            'is_default' => 0
+	        ),
+	        array(
+	            'status' => 'errors_them',
+	            'state' => 'processing',
+	            'is_default' => 0
+	        ),
+	        array(
+	            'status' => 'no_poa',
+	            'state' => 'processing',
+	            'is_default' => 0
+	        ),
+	        array(
+	            'status' => 'ready',
+	            'state' => 'processing',
+	            'is_default' => 0
+	        )
+	    )
+	);
+	/*
+	
+// add 
+
+	$setup = new Mage_Sales_Model_Mysql4_Setup('sales_setup');
+	$setup->addAttribute(
+	    'order_item', 
+	    'sca_status', 
+	    array(
+	        'type' 		=> 'varchar',
+	        'grid' 		=> false,
+			'default' 	=> null
+	    )
+	);
+	
+	$setup->addAttribute(
+	    'order_item', 
+	    'sca_processed', 
+	    array(
+	        'type' 		=> 'boolean',
+	        'grid' 		=> false,
+			'default' 	=> null
+	    )
+	);
+	
+	
+	/*
 	
 	// create price rule for detecting presence of Membership product ==> reduce all other prices to $0.00
     $rule = Mage::getModel('salesrule/rule');
@@ -747,6 +825,7 @@
 
     $rule->getActions()->addCondition($actions);
     $rule->save();
+	*/
 	
 	$installer->endSetup();
 ?>

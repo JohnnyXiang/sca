@@ -37,6 +37,7 @@
 		<reference name="product.info.options.wrapper">
 			<block type="dan_sca/product_option" name="dan.sca.product.option" template="dan_sca/product/temp.phtml" />
 		</reference>
+
 	</catalog_product_view>
 	
 	

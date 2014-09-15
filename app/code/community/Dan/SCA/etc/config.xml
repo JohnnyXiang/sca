@@ -160,4 +160,17 @@
         </routers>
     </frontend>
 	
+    <crontab>
+        <jobs>
+            <dan_sca_do_order_dispatch>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr><!-- Run every 5 min -->
+                </schedule>
+                <run>
+                    <model>dan_sca/observer::doAutomatedDispatch</model>
+                </run>
+            </dan_sca_do_order_dispatch>
+        </jobs>
+    </crontab>
+	
 </config>

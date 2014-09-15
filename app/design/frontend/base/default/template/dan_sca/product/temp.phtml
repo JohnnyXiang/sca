@@ -69,67 +69,188 @@
 	$js_weapon_choices_gameunits = json_encode($weapon_choices_gameunits);
 ?>
 
-	<!-- <p class="required"><?php // echo $this->__('* Required Fields') ?></p> !-->
-	<br>
-	<label>Intended Weapon</label>
-	<select name="options[weapon]" id="selWeapon" style="width:200px;" onchange="validateWeaponSel(this);">
-		<option value=""><?php echo $selText; ?></option>
-		<?php foreach($weapon_choices as $weapon) echo '<option value="'. $weapon .'">'. $weapon .'</option>'; ?>
-	</select>
-	<br>
-	<br>
-	<label>Desired Game Unit</label>
-	<select name="options[gameunit]" id="selGameunit" style="width:200px;" onchange="validateGameunitSel(this);" disabled>
-		<option value=""><?php echo $selText; ?></option>
-	</select>
+
+    <script type="text/javascript">
+    //<![CDATA[
+    var optionTextCounter = {
+        count : function(field,cntfield,maxlimit){
+            if (field.value.length > maxlimit){
+                field.value = field.value.substring(0, maxlimit);
+            } else {
+                cntfield.innerHTML = maxlimit - field.value.length;
+            }
+        }
+    }
+
+    Product.Options = Class.create();
+    Product.Options.prototype = {
+        initialize : function(config) {
+            this.config = config;
+            this.reloadPrice();
+            document.observe("dom:loaded", this.reloadPrice.bind(this));
+        },
+        reloadPrice : function() {
+            var config = this.config;
+            var skipIds = [];
+            $$('body .product-custom-option').each(function(element){
+                var optionId = 0;
+                element.name.sub(/[0-9]+/, function(match){
+                    optionId = parseInt(match[0], 10);
+                });
+                if (config[optionId]) {
+                    var configOptions = config[optionId];
+                    var curConfig = {price: 0};
+                    if (element.type == 'checkbox' || element.type == 'radio') {
+                        if (element.checked) {
+                            if (typeof configOptions[element.getValue()] != 'undefined') {
+                                curConfig = configOptions[element.getValue()];
+                            }
+                        }
+                    } else if(element.hasClassName('datetime-picker') && !skipIds.include(optionId)) {
+                        dateSelected = true;
+                        $$('.product-custom-option[id^="options_' + optionId + '"]').each(function(dt){
+                            if (dt.getValue() == '') {
+                                dateSelected = false;
+                            }
+                        });
+                        if (dateSelected) {
+                            curConfig = configOptions;
+                            skipIds[optionId] = optionId;
+                        }
+                    } else if(element.type == 'select-one' || element.type == 'select-multiple') {
+                        if ('options' in element) {
+                            $A(element.options).each(function(selectOption){
+                                if ('selected' in selectOption && selectOption.selected) {
+                                    if (typeof(configOptions[selectOption.value]) != 'undefined') {
+                                        curConfig = configOptions[selectOption.value];
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        if (element.getValue().strip() != '') {
+                            curConfig = configOptions;
+                        }
+                    }
+                    if(element.type == 'select-multiple' && ('options' in element)) {
+                        $A(element.options).each(function(selectOption) {
+                            if (('selected' in selectOption) && typeof(configOptions[selectOption.value]) != 'undefined') {
+                                if (selectOption.selected) {
+                                    curConfig = configOptions[selectOption.value];
+                                } else {
+                                    curConfig = {price: 0};
+                                }
+                                optionsPrice.addCustomPrices(optionId + '-' + selectOption.value, curConfig);
+                                optionsPrice.reload();
+                            }
+                        });
+                    } else {
+                        optionsPrice.addCustomPrices(element.id || optionId, curConfig);
+                        optionsPrice.reload();
+                    }
+                }
+            });
+        }
+    }
+    function validateOptionsCallback(elmId, result) {
+        var container = $(elmId).up('ul.options-list');
+        if (result == 'failed') {
+            container.removeClassName('validation-passed');
+            container.addClassName('validation-failed');
+        } else {
+            container.removeClassName('validation-failed');
+            container.addClassName('validation-passed');
+        }
+    }
+    //]]>
+    </script>
+    <dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<!-- <p class="required"><?php // echo $this->__('* Required Fields') ?></p> !-->
+		<dt>
+			<label class="required">Intended Weapon</label>
+		</dt>
+		<dd>
+			<div class='input-box'>
+				<select name="options[weapon]" id="select_1" class=" required-entry product-custom-option" onchange="validateWeaponSel(this);">
+					<option value=""><?php echo $selText; ?></option>
+					<?php foreach($weapon_choices as $weapon) echo '<option value="'. $weapon .'">'. $weapon .'</option>'; ?>
+				</select>
+			</div>
+		</dd>
+		<dt>
+			<label class="required">Desired Game Unit</label>
+		</dt>
+		<dd>
+			<div class='input-box'>
+				<select name="options[gameunit]" id="select_2" class=" required-entry product-custom-option" onchange="validateGameunitSel(this);" disabled>
+					<option value=""><?php echo $selText; ?></option>
+				</select>
+			</div>
+		</dd>
+
 	
-	<script type="text/javascript">
+		<script type="text/javascript">
+			var weapon_choices_gameunits = <?php echo $js_weapon_choices_gameunits ?>;
+
+			function resetGameunits(gameunits){
+				// get and empty the current select list
+				var sel = document.getElementById("select_2");
+				sel.options.length = 0;
 		
-		var weapon_choices_gameunits = <?php echo $js_weapon_choices_gameunits ?>;
-	
-		function resetGameunits(gameunits){
-			// get and empty the current select list
-			var sel = document.getElementById("selGameunit");
-			sel.options.length = 0;
-			
-			// add the top option
-			var option = document.createElement("option");
-			option.text = '<?php echo $selText; ?>';
-			sel.add(option);
-			
-			// roll through the passed array and populate the rest of the options
-			gameunits.forEach(function(gu){
+				// add the top option
 				var option = document.createElement("option");
-				option.text = String(gu);
+				option.text = '<?php echo $selText; ?>';
 				sel.add(option);
-			});
-			sel.disabled=false;
-			var button = document.getElementById("addToCart");
-			button.disabled=true;
-		};
 		
-		function validateWeaponSel(me){
-			if(me.selectedIndex !=0){
-				resetGameunits(weapon_choices_gameunits[me.value]);
-			}
-			else{
-			// disable child elements
-				var sel = document.getElementById("selGameunit");
-				sel.disabled=true;
-				
-				var button = document.getElementById("addToCart");
-				button.disabled=true;
-			};
-		};
-		
-		function validateGameunitSel(me){
-			if(me.selectedIndex !=0){
-				var sel = document.getElementById("addToCart");
+				// roll through the passed array and populate the rest of the options
+				gameunits.forEach(function(gu){
+					var option = document.createElement("option");
+					option.text = String(gu);
+					sel.add(option);
+				});
 				sel.disabled=false;
-			}
-			else{ 
 				var button = document.getElementById("addToCart");
 				button.disabled=true;
 			};
-		};
-	</script>
+	
+			function validateWeaponSel(me){
+				if(me.selectedIndex !=0){
+					resetGameunits(weapon_choices_gameunits[me.value]);
+				}
+				else{
+				// disable child elements
+					var sel = document.getElementById("select_2");
+					sel.disabled=true;
+			
+					var button = document.getElementById("addToCart");
+					button.disabled=true;
+				};
+			};
+	
+			function validateGameunitSel(me){
+				if(me.selectedIndex !=0){
+					var sel = document.getElementById("addToCart");
+					sel.disabled=false;
+				}
+				else{ 
+					var button = document.getElementById("addToCart");
+					button.disabled=true;
+				};
+			};
+		</script>
+    </dl>

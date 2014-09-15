@@ -41,8 +41,8 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tabs extends Mage_Adminhtml_Block_Widge
 	        $this->addTab('form_section' . $tab_num, array(
 	            'label' => $this->_getHelper()->__('-- ' . $gameunit->getName()),
 	            'title' => $this->_getHelper()->__('-- ' . $gameunit->getName()),
-	            'content' => '<p>This is where the administrator will manage Gameunit Details in a similar way as they manage Customer Addresses</p>'
-					
+	            'content' => '<p>This is where the administrator will manage Gameunit Details in a similar way as they manage Customer Addresses</p>' 
+			
 			// $this->getLayout()->createBlock('dan_sca_adminhtml/state_edit_tab_details')->initForm($gameunit->getId())->toHtml()
 	        ));
 			

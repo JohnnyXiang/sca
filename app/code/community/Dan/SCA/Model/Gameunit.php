@@ -1,8 +1,7 @@
 <?php
 class Dan_SCA_Model_Gameunit extends Mage_Core_Model_Abstract {
  
-    private function getCurrentDetails(){
-
+    public function getCurrentDetails(){
 	    $collection = Mage::getModel('dan_sca/gameunit_detail')->getCollection();
 		$collection->getSelect()
 			->where('main_table.parent_id = '.$this->getId())

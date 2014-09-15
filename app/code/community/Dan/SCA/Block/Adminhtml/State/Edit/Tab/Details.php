@@ -53,9 +53,9 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
 		
 		/* @var $gameunit Dan_SCA_Model_Gameunit */
 		$gameunit = Mage::getModel('dan_sca/gameunit')->load($gameunitId);
-
+	
         $form = new Varien_Data_Form();
-        $fieldset = $form->addFieldset('address_fieldset', array(
+        $fieldset = $form->addFieldset('gameunit_detail_fieldset', array(
             'legend'    => Mage::helper('dan_sca')->__("Edit Gameunit Detail"))
         );
 
@@ -76,7 +76,6 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
 		*/
 		
         $detailCollection = $gameunit->getCurrentDetails();
-
         $this->assign('gameunit', $gameunit);
         $this->assign('detailCollection', $detailCollection);
         // $form->setValues($addressModel->getData());

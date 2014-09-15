@@ -33,6 +33,7 @@ class Dan_SCA_IndexController extends Mage_Core_Controller_Front_Action {
 			// we set directly on the customer object so that if the user registers during checkout, the value will be persisted & saved before the session->clear()
 			$customerSession = Mage::getSingleton('customer/session');
 			$customerSession->getCustomer()->setStateOfResidence($id);
+			$customerSession->setStateOfResidence($id);
 			
 			$jsonData = json_encode(true);
 			$this->getResponse()->setHeader('Content-type', 'application/json');

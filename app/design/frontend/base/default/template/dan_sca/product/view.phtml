@@ -28,7 +28,7 @@
 	if($gameunitOptions){
 		$popup = true;
 		$customerSession = Mage::getSingleton('customer/session');
-		if($stateOfResidence_id = $customerSession->getCustomer()->getStateOfResidence())
+		if($stateOfResidence_id = $customerSession->getCustomer()->getStateOfResidence() || $customerSession->getStateOfResidence())
 			$popup = false;
 	};
 
@@ -208,7 +208,7 @@
 	<script type="text/javascript">
 		jQuery(document).ready(function(){
 			setTimeout(function(){ 
-				jQuery.colorbox({width:"95%", inline:true, href:"#residence_popup", closeButton: false});
+				jQuery.colorbox({ width:"95%", inline:true, href:"#residence_popup", closeButton: false, overlayClose: false });
 			}, 1500);
 		});
 	</script>
