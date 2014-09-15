@@ -74,11 +74,9 @@ class Dan_SCA_Model_Observer{
 		};
 	}
 	
-	/* this cron reviews orders marked as 'Ready'
-	*   - for each item in the order, determine if it needs to be fed into the dispatch system
-	*   - if it does, feed it in
-	*   - *** DO NOT set item status or overall order status in this function!
-	*   - compare an Order's count(get_processed) versus the number of errors ==> change overall status 
+	/* this cron reviews orders w/status == 'ready'
+	*   - *** DO NOT adjust the item's status or overall order's status in this function!
+	*   - compare an order's count(get_processed) versus the number of errors ==> change overall status 
 	*/
 	public function doAutomatedDispatch($observer) {
 		
@@ -94,8 +92,17 @@ class Dan_SCA_Model_Observer{
 		$order = $orders->getFirstItem(); 
 
 		// ... roll through the order's items
-	    foreach($order->getAllItems() as $_i){
-
+		$items = $order->getAllItems();
+		$num = count($items);
+		$_iterator = 0;
+		
+		$errors_us = false;
+		$errors_them = false;
+		$block = false;
+	    foreach($items as $_i){
+			
+			$_iterator++;
+			
 			// if the the item's GetsProcessed value is NULL, then we haven't looked at the item yet
 			if(is_null($_i->getScaGetsProcessed())){
 				
@@ -117,16 +124,48 @@ class Dan_SCA_Model_Observer{
 			
 			// if the item gets processed ...
 			if($_i->getScaGetsProcessed()){
-
 				// ... and it doesn't have a status, then we've reached the item we need to process
 				if(is_null($_i->getScaStatus())){
+					
+					// feed into processing system
+					// *** here
+					
 					$_i->setScaStatus('processing');
 					$_i->save();
+					$block = true;
 				}
 				else if($_i->getScaStatus() == 'processing'){
 					// we've reached the currently-processing item; we can't go any futher until it finishes.
 					break;
+				}
+				else if($_i->getScaStatus() == 'errors_us'){
+					$errors_us = true;
+				}
+				else if($_i->getScaStatus() == 'errors_them'){
+					$errors_them = true;
 				};
+			};
+			
+			// due to the BREAK in the preceeding if() statement (which would prevent getting here (and interrupt the foreach() if any part of the order was currently processing), we'll only reach this point if the entire order has been processed
+			if($num == $_iterator && !$block){
+				
+				if($errors_us){
+					$order->setStatus('errors_us');
+				}
+				else if($errors_them){
+					$order->setStatus('errors_them');
+				}
+				else{
+					
+					// set order ==> complete ... Magento does not permit this manually unless the order has been invoiced & shipped (?)
+					/*
+					$order->setState('complete');
+					$order->setStatus('complete');
+					$history = $order->addStatusHistoryComment('This order has been processed successfully.', false);
+					$history->setIsCustomerNotified(false);
+					*/
+				}
+				$order->save();
 			};
 	    };
 	}

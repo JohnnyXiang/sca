@@ -547,11 +547,31 @@
 		'user_defined'	=> true 
 	));
 	
+	// $this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'pref_point');
+	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'pref_point', array(
+		'attribute_set' => 'Draw Entry',
+	    'label'         => 'Preference Point if not drawn?',
+		'type'			=> 'int',
+	    'input'         => 'boolean'
+		'searchable'	=> true,
+		'user_defined'	=> true,
+        'default' 		=> false
+	));
+	
+	// $this->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'pref_point_cost');
+	$this->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'pref_point_cost', array(
+		'attribute_set' => 'Draw Entry',
+	    'label'         => 'Preference Point Cost',
+	    'input'         => 'price',
+		'type'			=> 'decimal',
+		'user_defined'	=> true 
+	));
+	
 
 	$attributeSetId = $this->getAttributeSetId('catalog_product', 'Draw Entry');
 	$attributeGroupId = $this->getAttributeGroupId('catalog_product', $attributeSetId, 'General');
 	
-	$attributeList = ['animal_id', 'state_id', 'fee_resident', 'fee_non_resident'];
+	$attributeList = ['animal_id', 'state_id', 'fee_resident', 'fee_non_resident', 'pref_point', 'pref_point_cost'];
 	
 	// add attributes to set
 	foreach($attributeList as $_attr){
@@ -716,8 +736,8 @@
 	    ),
 	    array(
 			array('status' => 'no_poa', 'label' => 'Awaiting Power of Attorney'),
-	        array('status' => 'errors_us', 'label' => 'Processing'),
 	        array('status' => 'errors_them', 'label' => 'Errors requiring correction'),
+			array('status' => 'errors_us', 'label' => 'Queued for Processing'),
 			array('status' => 'ready', 'label' => 'Queued for Processing')
 	    )
 	);
@@ -753,9 +773,9 @@
 	        )
 	    )
 	);
-	/*
-	
-// add 
+
+/*	
+// add sca-related columns to order_items table
 
 	$setup = new Mage_Sales_Model_Mysql4_Setup('sales_setup');
 	$setup->addAttribute(
@@ -778,8 +798,25 @@
 	    )
 	);
 	
+	$setup->addAttribute(
+	    'order_item', 
+	    'sca_url', 
+	    array(
+	        'type' 		=> 'varchar',
+	        'grid' 		=> false,
+			'default' 	=> null
+	    )
+	);
 	
-	/*
+	$setup->addAttribute(
+	    'order_item', 
+	    'sca_msg', 
+	    array(
+	        'type' 		=> 'varchar',
+	        'grid' 		=> false,
+			'default' 	=> null
+	    )
+	);
 	
 	// create price rule for detecting presence of Membership product ==> reduce all other prices to $0.00
     $rule = Mage::getModel('salesrule/rule');
