@@ -53,34 +53,82 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
 		
 		/* @var $gameunit Dan_SCA_Model_Gameunit */
 		$gameunit = Mage::getModel('dan_sca/gameunit')->load($gameunitId);
+		$detailModel = Mage::getModel('dan_sca/gameunit_detail');
 	
         $form = new Varien_Data_Form();
         $fieldset = $form->addFieldset('gameunit_detail_fieldset', array(
             'legend'    => Mage::helper('dan_sca')->__("Edit Gameunit Detail"))
         );
 
-        $detailModel = Mage::getModel('dan_sca/gameunit_detail');
-		
-		/*
-        $addressForm = Mage::getModel('customer/form');
-        $addressForm->setFormCode('adminhtml_customer_address')
-            ->setEntity($addressModel)
-            ->initDefaultValues();
+		$fieldset->addField('parent_id', 'text', array(
+				'name'	=> 'parent_id',
+				'title'	=> 'Parent ID (hide later)',
+				'label' => 'Parent ID (hide later)'
+			));
 
-        $attributes = $addressForm->getAttributes();
-        foreach ($attributes as $attribute) {
-            $attribute->setFrontendLabel(Mage::helper('dan_sca')->__($attribute->getFrontend()->getLabel()));
-            $attribute->unsIsVisible();
-        }
-        $this->_setFieldset($attributes, $fieldset);
-		*/
+
+		$fieldset->addField('year', 'text', array(
+				'name'	=> 'year',
+				'title'	=> 'Year',
+				'label' => 'Year'
+			));
 		
+		// retrieve the animal name / id options from the animal source model
+	    $attr = Mage::getModel('eav/config')->getAttribute(Mage_Catalog_Model_Product::ENTITY, 'animal_id');
+	    $opts = $attr->setStoreId(0)->getSource()->getAllOptions();
+		
+		// format the option values as necessary to be used in addField()
+		$animal_opts = array();
+		foreach($opts as $_k => $_v){
+			// skip the first one (it's empty)
+			if($_k)
+				$animal_opts[$_v['value']] = $_v['label'];
+		};
+		
+		$fieldset->addField('animal_id', 'select', array(
+				'name'	=> 'animal_id',
+				'title'	=> 'Animal',
+				'label' => 'Animal',
+				'options'	=> $animal_opts,
+				'required'	=> true
+			));
+		
+		$fieldset->addField('weapon', 'select', array(
+				'name'	=> 'weapon',
+				'title'	=> 'Weapon',
+				'label' => 'Weapon',
+				'options'	=> array(
+					'Archery'		=> 'Archery',
+					'Rifle'			=> 'Rifle',
+					'Muzzle Loader'	=> 'Muzzle Loader'
+				),
+				'required'	=> true
+			));
+			
+		$fieldset->addField('available_tags', 'text', array(
+				'name'	=> 'available_tags',
+				'title'	=> '# Tags Available',
+				'label' => '# Tags Available'
+			));
+				
+		$fieldset->addField('tag_applications', 'text', array(
+				'name'	=> 'tag_applications',
+				'title'	=> '# Applied',
+				'label' => '# Applied'
+			));
+			
+		$fieldset->addField('num_tagged_out', 'text', array(
+				'name'	=> 'num_tagged_out',
+				'title'	=> '# "Tagged out"',
+				'label' => '# "Tagged out"'
+			));
+
         $detailCollection = $gameunit->getCurrentDetails();
+
         $this->assign('gameunit', $gameunit);
         $this->assign('detailCollection', $detailCollection);
-        // $form->setValues($addressModel->getData());
+        $form->setValues($detailModel->getData());
         $this->setForm($form);
-
         return $this;
     }
 
@@ -107,27 +155,5 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
             'image'     => Mage::getConfig()->getBlockClassName('adminhtml/customer_form_element_image'),
             'boolean'   => Mage::getConfig()->getBlockClassName('adminhtml/customer_form_element_boolean'),
         );
-    }
-	
-    public function addValuesToNamePrefixElement($values)
-    {
-        if ($this->getForm() && $this->getForm()->getElement('prefix')) {
-            $this->getForm()->getElement('prefix')->addElementValues($values);
-        }
-        return $this;
-    }
-
-    /**
-     * Add specified values to name suffix element values
-     *
-     * @param string|int|array $values
-     * @return Mage_Adminhtml_Block_Customer_Edit_Tab_Addresses
-     */
-    public function addValuesToNameSuffixElement($values)
-    {
-        if ($this->getForm() && $this->getForm()->getElement('suffix')) {
-            $this->getForm()->getElement('suffix')->addElementValues($values);
-        }
-        return $this;
     }
 }

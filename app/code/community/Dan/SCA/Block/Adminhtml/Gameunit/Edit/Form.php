@@ -94,7 +94,7 @@ class Dan_SCA_Block_Adminhtml_Gameunit_Edit_Form extends Mage_Adminhtml_Block_Wi
 			if($name == 'parent_id' && $parent_id){
 				$_data['value'] = $parent_id;
 			};
-			
+
             // Finally, call vanilla functionality to add field.
             $fieldset->addField($name, $_data['input'], $_data);
         };

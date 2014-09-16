@@ -13,7 +13,7 @@ class Dan_SCA_Block_Adminhtml_State_Grid extends Mage_Adminhtml_Block_Widget_Gri
         return $this->getUrl('dan_sca_admin/state/edit', array('id' => $row->getId()));
     }
 
-    protected function _prepareColumns(){
+    protected function _prepareColumns(){		
         $this->addColumn('entity_id', array(
             'header' 	=> $this->_getHelper()->__('ID'),
             'type' 		=> 'number',
@@ -45,6 +45,7 @@ class Dan_SCA_Block_Adminhtml_State_Grid extends Mage_Adminhtml_Block_Widget_Gri
         $this->addColumn('convenience_fee', array(
             'header' 	=> $this->_getHelper()->__('Convenience Fee'),
             'type' 		=> 'price',
+			'currency_code' => Mage::app()->getStore()->getBaseCurrency()->getCode(),
             'index' 	=> 'convenience_fee',
         ));
 
