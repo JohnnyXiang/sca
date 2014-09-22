@@ -45,7 +45,7 @@ app/design/adminhtml/default/default/template/captcha
 app/design/adminhtml/default/default/template/catalog
 app/design/adminhtml/default/default/template/centinel
 app/design/adminhtml/default/default/template/cms
-app/design/adminhtml/default/default/template/complier
+app/design/adminhtml/default/default/template/compiler
 app/design/adminhtml/default/default/template/connect
 app/design/adminhtml/default/default/template/currencysymbol
 app/design/adminhtml/default/default/template/customer
