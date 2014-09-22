@@ -122,6 +122,15 @@
 	                </dan_sca>
 	            </observers>					
 			</customer_register_success>
+			<adminhtml_customer_prepare_save>
+	            <observers>
+	                <dan_sca>
+						<type>singleton</type>
+	                    <class>dan_sca/observer</class>
+	                    <method>makeReady</method>
+	                </dan_sca>
+	            </observers>	
+			</adminhtml_customer_prepare_save>
 	    </events>
 	</global>
 	

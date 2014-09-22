@@ -55,5 +55,26 @@
 	        $secret = $string . $salt;
 	        return (string)Mage::helper('core')->getHash($secret);
 	    }
+		
+		// helper to get encryption keys from API endpoint
+		public function getNewEncryptionKey($customer_id, $encrypted_data = null){
+			$payload = array('entity_id' => $customer_id, 'data' => $encrypted_data);
+			$jsonData = Mage::helper('core')->jsonEncode($payload);
+			$httpClient = new Zend_Http_Client('http://our.server.address:3713');
+			return $httpClient->setRawData($jsonData, 'json')->request('POST');
+		}
+		
+		public function performKeyRoll($customer){
+			// lines to support key roll of encrypted data
+			$secured_data = $customer->getSecuredData();
+			$encryption_keys = $this->getNewEncryptionKey($customer->getId(), $secured_data);
+			$iv = substr($secured_data, 0, 16);
+			$unsecured_data = openssl_decrypt(substr($secured_data, 16), "AES-256-CBC", $encryption_keys[0], 0, $iv);
+			$iv = mcrypt_create_iv(16, MCRYPT_RAND);
+			$encrypted = openssl_encrypt($unsecured_data, "AES-256-CBC", $encryption_keys[1], 0, $iv);
+			$secured_data = $iv.$encrypted;
+			$customer->setSecuredData($secured_data);
+			$customer->save();
+		}
 	}
 ?>

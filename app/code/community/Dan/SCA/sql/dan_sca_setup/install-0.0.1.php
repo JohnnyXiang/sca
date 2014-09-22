@@ -2,7 +2,7 @@
 	$installer = $this;
 	$installer->startSetup();
 
-	/*
+
 	// create state table (non-EAV)
 	$table = new Varien_Db_Ddl_Table();
 	$table->setName($installer->getTable('dan_sca/state'));
@@ -484,6 +484,7 @@
 	$table->setOption('charset', 'utf8');
 	$installer->getConnection()->createTable($table);
 	
+	/*
 	
 	// create a new attribute set for Draw Entry
 	$sNewAttributeSetName = 'Draw Entry';
@@ -616,7 +617,6 @@
 	    'visible_on_front' 	=> true
 	));
 	$customerEntities['state_of_residence'] = array('customer_account_create', 'customer_account_edit', 'adminhtml_customer');
-
 	
 	// $installer->removeAttribute($entity, 'color_eyes');
 	$installer->addAttribute($entity, 'color_eyes', array(
@@ -689,6 +689,124 @@
 		'required' 			=> false
 	));
 	$customerEntities['update_token'] = array('adminhtml_customer');
+	
+	
+	// faux holder for CC (for manual entry)
+	// $installer->removeAttribute($entity, 'faux_cc');
+	$installer->addAttribute($entity, 'faux_cc', array(
+	    'label'				=> 'Credit Card (manual entry)',
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['faux_cc'] = array('adminhtml_customer');
+	
+	// faux holder for CC (for manual entry)
+	// $installer->removeAttribute($entity, 'faux_ccv');
+	$installer->addAttribute($entity, 'faux_ccv', array(
+	    'label'				=> 'CCV (manual entry)',
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['faux_ccv'] = array('adminhtml_customer');
+	
+	// faux holder for SSN (for manual entry)
+	// $installer->removeAttribute($entity, 'faux_ssn');
+	$installer->addAttribute($entity, 'faux_ssn', array(
+	    'label'				=> 'SSN (manual entry)',
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['faux_ssn'] = array('adminhtml_customer');
+	
+	// faux holder for Driver's License (for manual entry)
+	// $installer->removeAttribute($entity, 'faux_dl');
+	$installer->addAttribute($entity, 'faux_dl', array(
+	    'label'				=> "Driver's License (manual entry)",
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['faux_dl'] = array('adminhtml_customer');
+	
+	// $installer->removeAttribute($entity, 'secured_data');
+	$installer->addAttribute($entity, 'secured_data', array(
+	    'label'				=> 'Sensitive Data (encrypted)',
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['secured_data'] = array('adminhtml_customer');
+	
+	// $installer->removeAttribute($entity, 'last_four_ssn');
+	$installer->addAttribute($entity, 'last_four_ssn', array(
+	    'label'				=> 'Sensitive Data (encrypted)',
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> false,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['last_four_ssn'] = array('adminhtml_customer');
+	
+	// $installer->removeAttribute($entity, 'last_four_cc');
+	$installer->addAttribute($entity, 'last_four_cc', array(
+	    'label'				=> 'Sensitive Data (encrypted)',
+		'type'				=> 'varchar',
+	    'input'         	=> 'text',
+	    'visible' 			=> false,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false
+	));
+	$customerEntities['last_four_ssn'] = array('adminhtml_customer');
+	
+	// $installer->removeAttribute($entity, 'cc_type');
+	$installer->addAttribute($entity, 'cc_type', array(
+	    'label'				=> 'Card Type',
+		'type'				=> 'varchar',
+	    'input'         	=> 'select',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false,
+		'source'			=> 'dan_sca/source_cards'
+	));
+	$customerEntities['last_four_ssn'] = array('adminhtml_customer');
+	
+	// $installer->removeAttribute($entity, 'cc_exp_mo');
+	$installer->addAttribute($entity, 'cc_exp_mo', array(
+	    'label'				=> 'Card Exp Mo',
+		'type'				=> 'varchar',
+	    'input'         	=> 'select',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false,
+		'source'			=> 'dan_sca/source_months'
+	));
+	$customerEntities['cc_exp_mo'] = array('adminhtml_customer');
+	
+	// $installer->removeAttribute($entity, 'cc_exp_yr');
+	$installer->addAttribute($entity, 'cc_exp_yr', array(
+	    'label'				=> 'Card Exp Yr',
+		'type'				=> 'varchar',
+	    'input'         	=> 'select',
+	    'visible' 			=> true,
+	    'required' 			=> false,
+	    'visible_on_front' 	=> false,
+		'source'			=> 'dan_sca/source_years'
+	));
+	$customerEntities['cc_exp_yr'] = array('adminhtml_customer');
 
 	$attributeSetId   = $installer->getDefaultAttributeSetId($entity);
 	$attributeGroupId = $installer->getDefaultAttributeGroupId($entity, $attributeSetId);
@@ -722,7 +840,7 @@
 	};
 
 	
-	*/
+
 
 // add our order statues
 	$statusTable = $installer->getTable('sales/order_status');
@@ -737,7 +855,7 @@
 	    array(
 			array('status' => 'no_poa', 'label' => 'Awaiting Power of Attorney'),
 	        array('status' => 'errors_them', 'label' => 'Errors requiring correction'),
-			array('status' => 'errors_us', 'label' => 'Queued for Processing'),
+			array('status' => 'errors_us', 'label' => 'Queued for Processing.'),
 			array('status' => 'ready', 'label' => 'Queued for Processing')
 	    )
 	);
@@ -774,7 +892,7 @@
 	    )
 	);
 
-/*	
+
 // add sca-related columns to order_items table
 
 	$setup = new Mage_Sales_Model_Mysql4_Setup('sales_setup');

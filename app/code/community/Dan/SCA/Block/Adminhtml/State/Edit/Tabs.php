@@ -42,15 +42,9 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tabs extends Mage_Adminhtml_Block_Widge
 	        $this->addTab('form_section' . $tab_num, array(
 	            'label' => $this->_getHelper()->__('-- ' . $gameunit->getName()),
 	            'title' => $this->_getHelper()->__('-- ' . $gameunit->getName()),
+				// 'class'	=> 'ajax',
+				// 'url'	=> $this->getUrl('*/*/*', array('_current' => true))
 	            
-				/** currently, this actually renders the content inside every Gameunit tab
-				*  This could become EXTREMELY inefficient, since a state could have 100+ Gameunits, and each
-				*	one of the Gameunits might have 10+ Gameunit Details.  Additionally, when you're working inside
-				*	a Gameunit's tab (making changes to Gameunit Details), I believe the SAVE button has to be pressed
-				*	... so it doesn't make sense to load 1000+ elements when you can only realistically work on & save
-				*	10 or so of them at a time.
-				*/
-				
 				// notice, I'm passing the current Gameunit's ID (we're inside a foreach()) to the initForm() function
 				'content' => $this->getLayout()->createBlock('dan_sca_adminhtml/state_edit_tab_details')->initForm($gameunit->getId())->toHtml()	
 	        ));

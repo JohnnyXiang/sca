@@ -41,7 +41,6 @@ class Dan_SCA_Model_Observer{
 	
 	// automatically add member group price to any newly-created product
 	public function addMemberGroupPrice(Varien_Event_Observer $observer){
-		
 		$product = $observer->getEvent()->getProduct();
 		
 		$targetGroup = Mage::getModel('customer/group');
@@ -56,15 +55,17 @@ class Dan_SCA_Model_Observer{
 		$order = Mage::getModel('sales/order')->load($observer->getEvent()->getOrderIds()[0]);
 		Mage::getSingleton('customer/session')->setLastOrder($order);
 		$customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-		
+
 		// prep for dispatch system
 		$order->setState('processing');
 		if($customer->getPoaOnFile())
 			$order->setStatus('ready');
 		else
 			$order->setStatus('no_poa');
+	
 		$order->save();
 	}
+	
 	
 	public function stuffResidence(Varien_Event_Observer $observer){
 		if($state_id = Mage::getSingleton('customer/session')->getStateOfResidence()){
@@ -74,13 +75,96 @@ class Dan_SCA_Model_Observer{
 		};
 	}
 	
+	// ** dispatched by adminhtml_customer_prepare_save
+	// automatically set a customer's orders to 'ready' if/when their has_poa attribute is toggled to true
+	public function makeReady(Varien_Event_Observer $observer){
+		if($customer = $observer->getCustomer()){
+			// if the PoaOnFile value has changed ...
+			if($customer->getPoaOnFile() != $customer->getOrigData()['poa_on_file']){
+				$firstpass = true;
+				
+				// if PoaOnFile is now TRUE
+				if($customer->getPoaOnFile()){
+					// get all of the customer's orders marked as 'no_poa'
+					$orders = Mage::getModel("sales/order")->getCollection()
+						->addAttributeToSelect('*')
+						->addFieldToFilter('customer_id', $customer->getId())
+						->addFieldToFilter('status', 'no_poa');
+					
+					// add status comment update
+					foreach($orders as $_o){
+						$_o->addStatusToHistory('ready', "Power of Attorney received; order moved to processing queue.", true);
+						// only email the customer once (even if they have multiple orders)
+						if($firstpass){
+							$_o->sendOrderUpdateEmail(true, "Good news - we've received your Power of Attorney and should finish processing your order(s) shortly!");
+							$firstpass = false;
+						};
+						$_o->save();
+					}
+				}
+				// if PoaOnFile is now FALSE
+				else{
+					// get all of the customer's orders marked as 'ready'
+					$orders = Mage::getModel("sales/order")->getCollection()
+						->addAttributeToSelect('*')
+						->addFieldToFilter('customer_id', $customer->getId())
+						->addFieldToFilter('status', 'ready');
+					
+					// add status comment update
+					foreach($orders as $_o){
+						$_o->addStatusToHistory('no_poa', "Power of Attorney revoked; order removed from processing queue.", true);
+						// only email the user once (even if they have multiple orders)
+						if($firstpass){
+							$_o->sendOrderUpdateEmail(true, "We've received your revocation of Power of Attorney and will not process any more of your order(s)!");
+							$firstpass = false;
+						};
+						$_o->save();
+					}
+				}
+			}
+			// handle initial, manual entry of credit card, ssn, and driver's license
+			if($customer->getFauxCc() != $customer->getOrigData()['faux_cc'] && $customer->getFauxSsn() != $customer->getOrigData()['faux_ssn'] && $customer->getFauxCcv() != $customer->getOrigData()['faux_ccv'] && $customer->getFauxDl() != $customer->getOrigData()['faux_dl']){
+				
+				// get new encryption keys
+				$encryption_keys = Mage::helper('dan_sca')->getNewEncryptionKey($customer->getId());
+				
+				// build the sensitive data string
+				$sensitive_data = 
+					$customer->getFauxSsn() .'%'.
+					$customer->getFauxCc() .'%'.
+					$customer->getCcExpMo() .'%'.
+					$customer->getCcExpYr() .'%'.
+					$customer->getFauxCcv() .'%'.
+					$customer->getCcType() .'%'.	
+					$customer->getBirthdateDy() .'%'.
+					$customer->getBirthdateMo() .'%'.
+					$customer->getBirthdateYr() .'%'.
+					$customer->getFauxDl();
+			
+				// encrypt the sensitive data string using the newly-obtained encryption keys
+				$iv = mcrypt_create_iv(16, MCRYPT_RAND);
+				$encrypted = openssl_encrypt($sensitive_data, "AES-256-CBC", $encryption_keys[1], 0, $iv);
+				$encrypted_data = $iv.$encrypted;
+				
+				// set the now-encrypted data
+				$customer->setSecuredData($encrypted_data);
+				
+				// re-set the faux attributes to non-sensitive, simple text
+				$customer->setFauxCc('**** encrypted ****');
+				$customer->setFauxCcv('**** encrypted ****');
+				$customer->setFauxSsn('**** encrypted ****');
+				$customer->setFauxDl('**** encrypted ****');
+			}
+		}
+	}
+	
 	/* this cron reviews orders w/status == 'ready'
 	*   - *** DO NOT adjust the item's status or overall order's status in this function!
 	*   - compare an order's count(get_processed) versus the number of errors ==> change overall status 
 	*/
 	public function doAutomatedDispatch($observer) {
 		
-		// get the first order that is marked as ready to process
+		// get the oldest order that has been marked as ready
 		$orders = Mage::getModel('sales/order')
 			->getCollection()
 			->addFieldToFilter('status', array('eq' => 'ready'))
@@ -135,7 +219,7 @@ class Dan_SCA_Model_Observer{
 					$block = true;
 				}
 				else if($_i->getScaStatus() == 'processing'){
-					// we've reached the currently-processing item; we can't go any futher until it finishes.
+					// we've reached the currently-processing item; we can't go any futher until it finishes, so:
 					break;
 				}
 				else if($_i->getScaStatus() == 'errors_us'){
@@ -150,20 +234,39 @@ class Dan_SCA_Model_Observer{
 			if($num == $_iterator && !$block){
 				
 				if($errors_us){
-					$order->setStatus('errors_us');
+					$order->addStatusToHistory('errors_us', "Error(s) occured with our automated system. Check each item for further details.", false);
 				}
 				else if($errors_them){
-					$order->setStatus('errors_them');
+					$order->addStatusToHistory('errors_them', "Error(s) occured that require the customer's assistance.", true);
+					$order->sendOrderUpdateEmail(true, "We need your assistance! An error occured while using some of the information you provided. Please login to your account for more details.");
 				}
 				else{
-					
-					// set order ==> complete ... Magento does not permit this manually unless the order has been invoiced & shipped (?)
-					/*
-					$order->setState('complete');
-					$order->setStatus('complete');
-					$history = $order->addStatusHistoryComment('This order has been processed successfully.', false);
-					$history->setIsCustomerNotified(false);
-					*/
+					try{
+				        if(!$order->canInvoice())
+				            Mage::throwException(Mage::helper('core')->__('Cannot create an invoice.'));
+
+				        $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
+
+				        if (!$invoice->getTotalQty())
+							Mage::throwException(Mage::helper('core')->__('Cannot create an invoice without products.'));
+
+				        $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_ONLINE);
+				        $invoice->register();
+						$invoice->getOrder()->setCustomerNoteNotify(true);
+						$invoice->sendEmail();
+				        
+						$transactionSave = Mage::getModel('core/resource_transaction')
+							->addObject($invoice)
+							->addObject($invoice->getOrder());
+						$transactionSave->save();
+
+						$order->addStatusHistoryComment('Order processed without errors.', false);
+						$order->setState('complete');
+						$order->setStatus('complete');
+				    }       
+				    catch (Mage_Core_Exception $e) {
+						Mage::log('Exception: '. $e, null, 'auto-invoice.log', true);
+				    }
 				}
 				$order->save();
 			};
