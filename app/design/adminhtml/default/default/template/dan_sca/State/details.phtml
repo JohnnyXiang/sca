@@ -1,4 +1,13 @@
+<?php 
+$gameunit = Mage::registry('current_gameunit');
+?>
+<div class="details_wrapper">
 <!-- Gameunit Details list -->
+<style>
+a.btn-remove-detail,a.btn-edit-detail{
+text-decoration:none;
+}
+</style>
 <table cellspacing="0" class="form-edit">
 <tr>
 	<!-- list of detail items (left-hand column) !-->
@@ -8,7 +17,7 @@
     </div>
 	
     <div class="sub-btn-set"><?php echo $this->getAddNewButtonHtml() ?></div>
-	<ul id="detail_list">
+	<ul id="detail_list_<?php echo $gameunit->getId(); ?>">
 	<?php $animal = Mage::getModel('dan_sca/animal'); ?>
     <?php $_iterator = 0; ?>
     <?php if(count($detailCollection)): ?>
@@ -44,7 +53,7 @@
   <td>
 <!-- Template for adding detail item to list !-->
     <?php $_templatePrefix = $this->getTemplatePrefix() ?>
-	<div id="detail_item_template" class="no-display template">
+	<div id="detail_item_template_<?php echo $gameunit->getId(); ?>" class="no-display template">
       <detail>
 	  <table>
 	    <tr>
@@ -67,7 +76,7 @@
     </div>
 
 <!-- Detail form template -->
-    <div id="detail_form_template" class="no-display template">
+    <div id="detail_form_template_<?php echo $gameunit->getId(); ?>" class="no-display template">
     <?php
         // Set form template elements prefix
         $this->getForm()->setHtmlIdPrefix($_templatePrefix)
@@ -78,7 +87,7 @@
     </div>
 
 <!-- Details forms -->
-    <div class="entry-edit" id="detail_form_container">
+    <div class="entry-edit" id="detail_form_container_<?php echo $gameunit->getId(); ?>">
 	  <?php if(count($detailCollection)): ?>
 		<?php foreach ($detailCollection as $_detail): ?>
 		  <div id="form_detail_item_<?php echo $_detail->getId() ?>" style="display:none">
@@ -92,7 +101,7 @@
           </div>
         <?php endforeach; ?>
       <?php else: ?>
-		<div id="no_detail_message"><?php echo Mage::helper('dan_sca')->__('This gameunit has no saved details.') ?></div>
+		<div id="no_detail_message_<?php echo $gameunit->getId(); ?>"><?php echo Mage::helper('dan_sca')->__('This gameunit has no saved details.') ?></div>
       <?php endif; ?>
     </div>
   </td>
@@ -106,10 +115,10 @@ var detailsModel = Class.create();
 detailsModel.prototype = {
     initialize : function() {
         this.activeItem   = null;
-        this.itemTemplate = $('detail_item_template');
-        this.formTemplate = $('detail_form_template');
-        this.itemContainer= $('detail_list');
-        this.formContainer= $('detail_form_container');
+        this.itemTemplate = $('detail_item_template_<?php echo $gameunit->getId(); ?>');
+        this.formTemplate = $('detail_form_template_<?php echo $gameunit->getId(); ?>');
+        this.itemContainer= $('detail_list_<?php echo $gameunit->getId(); ?>');
+        this.formContainer= $('detail_form_container_<?php echo $gameunit->getId(); ?>');
         this.baseItemId   = 'new_item';
 
 		// *** need to look at
@@ -139,16 +148,16 @@ detailsModel.prototype = {
     },
 
     reloadItemList : function(initial){
-        this.itemList = $$('#detail_list li');
+        this.itemList = $$('#detail_list_<?php echo $gameunit->getId(); ?> li');
         if( initial ) {
             this.itemCount = this.itemList.length;
         }
         if(!this.itemList.length){
-            if($('no_detail_message')){
-                $('no_detail_message').show();
+            if($('no_detail_message_<?php echo $gameunit->getId(); ?>')){
+                $('no_detail_message_<?php echo $gameunit->getId(); ?>').show();
             }
             else {
-                this.formContainer.innerHTML+= '<div id="no_detail_message"><?php echo addslashes(Mage::helper('dan_sca')->__('This gameunit has no saved details.')) ?></div>'
+                this.formContainer.innerHTML+= '<div id="no_detail_message_<?php echo $gameunit->getId(); ?>"><?php echo addslashes(Mage::helper('dan_sca')->__('This gameunit has no saved details.')) ?></div>'
             }
         }
     },
@@ -173,8 +182,8 @@ detailsModel.prototype = {
     addNewDetail : function(event){
         if(this.canCreateNewDetail){
             this.itemCount++;
-            if($('no_detail_message')){
-                $('no_detail_message').hide();
+            if($('no_detail_message_<?php echo $gameunit->getId(); ?>')){
+                $('no_detail_message_<?php echo $gameunit->getId(); ?>').hide();
             }
             // preventing duplication of ids for fields and blocks
             while ($$("div[id='form_detail_item_" + this.itemCount + "']").length) {
@@ -368,7 +377,7 @@ detailsModel.prototype = {
             if (this.activeItem == item && item != this.itemList[0]) this.setActiveItem(this.itemList[0]);
             if (item == this.itemList[0] && (this.itemList[1])) this.setActiveItem(this.itemList[1]);
 
-            this.formContainer.removeChild(item.formBlock);
+            //this.formContainer.removeChild(item.formBlock);
             this.itemContainer.removeChild(item);
             this.reloadItemList();
         }
@@ -391,6 +400,7 @@ detailsModel.prototype = {
     }
 }
 
-gameunitDetails = new detailsModel();
+gameunitDetails<?php echo $gameunit->getId(); ?> = new detailsModel();
 //]]>
 </script>
+</div>
