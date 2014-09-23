@@ -61,6 +61,55 @@ class Dan_SCA_Adminhtml_StateController extends Mage_Adminhtml_Controller_Action
 			    ->_addLeft($this->getLayout()->createBlock('dan_sca_adminhtml/state_edit_tabs'));
 		$this->renderLayout();
     }
+    
+    public function saveAction(){
+    	$data = $this->getRequest()->getPost();
+    	var_dump($data);
+    	if ($data) {
+    		try {
+	    		$redirectBack = $this->getRequest()->getParam('back', false);
+	    		$stateID = $this->getRequest()->getParam('id');
+	    		//state detail
+	    		$state = Mage::getModel('dan_sca/state');
+	    		$state->setData($data['stateData'])->setId($stateID)->save();
+	    		// Unset template data
+	    		if (isset($data['detail']['_template_'])) {
+	    			unset($data['detail']['_template_']);
+	    		}
+    		
+	    		if (!empty($data['detail'])) {
+	    			    		
+	    			foreach (array_keys($data['detail']) as $index) {
+	    				$gameunitDetail = Mage::getModel('dan_sca/gameunit_detail')->load($index);
+	    				$gameunitDatailData = $data['detail'][$index];
+	    				var_dump($gameunitDatailData['_deleted'],$gameunitDetail->getId());
+	    				if($gameunitDatailData['_deleted'] && $gameunitDetail->getId()){
+	    					$gameunitDetail->delete();
+	    				}else{
+		    				foreach($gameunitDatailData as $key=>$value){
+		    					$gameunitDetail->setData($key,$value);
+		    				}		
+	
+		    				$gameunitDetail->save();
+	    				}
+	    			}
+	    		}
+	    		
+	    		Mage::getSingleton('adminhtml/session')->addSuccess(
+	    			Mage::helper('adminhtml')->__('The state data has been saved.')
+	    		);
+    		}catch(Exception $e){
+    			$this->_getSession()->addException($e,
+    					Mage::helper('adminhtml')->__('An error occurred while saving the state data.'));
+    			$this->_getSession()->setStateData($data);
+    			$this->getResponse()->setRedirect($this->getUrl('*/state/edit', array('id'=>$this->getRequest()->getParam('id'))));
+    			return;
+    		}
+    		
+    	}
+    	
+    	$this->getResponse()->setRedirect($this->getUrl('*/*/index'));
+    }
 
     public function deleteAction(){
         $state = Mage::getModel('dan_sca/state');
@@ -118,6 +167,21 @@ class Dan_SCA_Adminhtml_StateController extends Mage_Adminhtml_Controller_Action
         }
 
         return $isAllowed;
+    }
+    
+    function gameunitAction(){
+    	$gameunitId = (int) $this->getRequest()->getParam('gameunit_id');
+    	$gameunit = Mage::getModel('dan_sca/gameunit');
+    	
+    	if ($gameunitId) {
+    		$gameunit->load($gameunitId);
+    	}
+    	
+    	Mage::register('current_gameunit', $gameunit);
+    	
+    	$this->loadLayout();
+    	$this->renderLayout();
+    	
     }
 }
 ?>

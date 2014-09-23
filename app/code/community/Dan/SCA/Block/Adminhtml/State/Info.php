@@ -7,7 +7,7 @@ class Dan_SCA_Block_Adminhtml_State_Info
         parent::_construct();
 
         $this->_blockGroup = 'dan_sca_adminhtml';
-        $this->_controller = 'state_info';
+        $this->_controller = 'state';
 
         // title of the page in the admin panel
         $this->_headerText = Mage::helper('dan_sca')->__('Required Info');

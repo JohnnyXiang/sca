@@ -2,6 +2,7 @@
 class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Block_Widget_Form {
     public function __construct(){
         parent::__construct();
+        $this->initForm();
         $this->setTemplate('dan_sca/state/details.phtml');
     }
 
@@ -23,7 +24,7 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
                     'name'   => 'add_detail_button',
                     'element_name' => 'add_detail_button',
                     'class'  => 'add',
-                    'onclick'=> 'gameunitDetails.addNewDetail()'
+                    'onclick'=> 'gameunitDetails'.$this->getGameunit()->getId().'.addNewDetail()'
                 ))
         );
         $this->setChild('cancel_button',
@@ -34,7 +35,7 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
                     'name'   => 'cancel_add_detail',
                     'element_name' => 'cancel_add_detail',
                     'class'  => 'cancel delete-detail',
-                    'onclick'=> 'gameunitDetails.cancelAdd(this)',
+                    'onclick'=> 'gameunitDetails'.$this->getGameunit()->getId().'.cancelAdd(this)',
                 ))
         );
         return parent::_prepareLayout();
@@ -49,22 +50,33 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tab_Details extends Mage_Adminhtml_Bloc
      *
      * @return Dan_SCA_Adminhtml_Block_State_Edit_Tab_Details
      */
-    public function initForm($gameunitId){
+    public function initForm($gameunitId=null){
 		
 		/* @var $gameunit Dan_SCA_Model_Gameunit */
-		$gameunit = Mage::getModel('dan_sca/gameunit')->load($gameunitId);
+    	
+    	if($gameunitId){
+			$gameunit = Mage::getModel('dan_sca/gameunit')->load($gameunitId);
+    	}elseif(Mage::registry('current_gameunit')){
+    		$gameunit = Mage::registry('current_gameunit');
+    	}
+    	
+    	if(!$gameunit){
+    		return false;
+    	}
+    	
+    	$this->setGameunit($gameunit);
+    	
 		$detailModel = Mage::getModel('dan_sca/gameunit_detail');
-	
+		$detailModel->setParentId($gameunit->getId());
+		
         $form = new Varien_Data_Form();
         $fieldset = $form->addFieldset('gameunit_detail_fieldset', array(
             'legend'    => Mage::helper('dan_sca')->__("Edit Gameunit Detail"))
         );
 
-		$fieldset->addField('parent_id', 'text', array(
-				'name'	=> 'parent_id',
-				'title'	=> 'Parent ID (hide later)',
-				'label' => 'Parent ID (hide later)'
-			));
+		$fieldset->addField('parent_id', 'hidden', array(
+				'name'	=> 'parent_id'
+		));
 
 
 		$fieldset->addField('year', 'text', array(

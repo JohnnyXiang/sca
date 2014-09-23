@@ -42,11 +42,11 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Tabs extends Mage_Adminhtml_Block_Widge
 	        $this->addTab('form_section' . $tab_num, array(
 	            'label' => $this->_getHelper()->__('-- ' . $gameunit->getName()),
 	            'title' => $this->_getHelper()->__('-- ' . $gameunit->getName()),
-				// 'class'	=> 'ajax',
-				// 'url'	=> $this->getUrl('*/*/*', array('_current' => true))
+				'class'	=> 'ajax',
+				'url'	=> $this->getUrl('*/*/gameunit', array('_current' => true,'gameunit_id'=>$gameunit->getId())),
 	            
 				// notice, I'm passing the current Gameunit's ID (we're inside a foreach()) to the initForm() function
-				'content' => $this->getLayout()->createBlock('dan_sca_adminhtml/state_edit_tab_details')->initForm($gameunit->getId())->toHtml()	
+				//'content' => $this->getLayout()->createBlock('dan_sca_adminhtml/state_edit_tab_details')->initForm($gameunit->getId())->toHtml()	
 	        ));
 			
 			$tab_num++;

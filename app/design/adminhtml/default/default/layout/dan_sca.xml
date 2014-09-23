@@ -13,4 +13,10 @@
         </reference>
 		!-->
     </dan_sca_adminhtml_state_edit>
+    
+    <dan_sca_admin_state_gameunit>
+    	<block type="core/text_list" name="root" output="toHtml">
+            <block type="dan_sca_adminhtml/state_edit_tab_details" name="gameunit.edit.detail"/>
+        </block>
+    </dan_sca_admin_state_gameunit>
 </layout>

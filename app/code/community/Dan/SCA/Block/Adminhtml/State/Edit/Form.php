@@ -4,7 +4,7 @@ class Dan_SCA_Block_Adminhtml_State_Edit_Form extends Mage_Adminhtml_Block_Widge
 	protected function _prepareForm() {
 		$form = new Varien_Data_Form(array(
 	            'id' => 'edit_form',
-	            'action' => $this->getUrl('dan_sca_admin/state/edit', array(
+	            'action' => $this->getUrl('dan_sca_admin/state/save', array(
 					'_current' => true,
 					'continue' => 0,
 				)),

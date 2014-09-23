@@ -168,6 +168,16 @@
             </dan_sca>
         </routers>
     </frontend>
+    
+    <adminhtml>		
+		<layout>
+			<updates>
+				<dan_sca>
+               		 <file>dan_sca.xml</file>
+           		</dan_sca>
+			</updates>
+		</layout>
+    </adminhtml>  
 	
     <crontab>
         <jobs>
